@@ -13,7 +13,7 @@ dev = ["bandit", "pyupgrade", "ruff"]
 test = ["pytest", "respx"]
 
 [project.scripts]
-boox = "boox.cli:app"
+boox = "src.boox.cli:app"
 
 [build-system]
 requires = ["setuptools", "wheel"]

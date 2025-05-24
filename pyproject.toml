@@ -9,8 +9,9 @@ requires-python = ">=3.12"
 dependencies = ["httpx", "pydantic", "typer[all]", "structlog"]
 
 [project.optional-dependencies]
-dev = ["bandit", "pyupgrade", "ruff"]
+lint = ["bandit", "pyupgrade", "ruff"]
 test = ["pytest", "respx"]
+release = ["build", "twine"]
 
 [project.scripts]
 boox = "src.boox.cli:app"

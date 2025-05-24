@@ -1,7 +1,7 @@
 [project]
 name = "pyBooxDrop"
 version = "0.1.0"
-description = "A well-organized, unofficial Onyx BooxDrop API and a simple CLI tool, written in Python."
+description = "A simple, unofficial Python library and CLI for Onyx BooxDrop."
 authors = [
   { name = "Filip Godlewski", email = "54432731+filipgodlewski@users.noreply.github.com" },
 ]

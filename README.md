@@ -10,7 +10,7 @@ TBD
 
 ## Requirements
 
-TBD
+- Python version >=3.12
 
 ## Installation
 

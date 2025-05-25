@@ -1,0 +1,55 @@
+[project]
+name = "pyBooxDrop"
+version = "0.1.0"
+description = "A simple, unofficial Python library and CLI for Onyx BooxDrop."
+authors = [
+  { name = "Filip Godlewski", email = "54432731+filipgodlewski@users.noreply.github.com" },
+]
+requires-python = ">=3.12"
+dependencies = ["httpx", "pydantic", "typer[all]", "structlog"]
+
+[project.optional-dependencies]
+lint = ["bandit", "pyupgrade", "ruff"]
+test = ["pytest", "respx"]
+release = ["build", "twine"]
+
+[project.scripts]
+boox = "src.boox.cli:app"
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+unsafe-fixes = true
+fix = true
+respect-gitignore = true
+extend-select = [
+  "E",   # pycodestyle (style issues)
+  "F",   # pyflakes (error detection)
+  "I",   # isort (import sorting)
+  "UP",  # pyupgrade (modern Python syntax)
+  "B",   # flake8-bugbear (likely bugs and code smells)
+  "C4",  # flake8-comprehensions (comprehension optimizations)
+  "TID", # flake8-tidy-imports (import restrictions and tidiness)
+  "SIM", # flake8-simplify (simplifiable code patterns)
+  "PL",  # pylint rules (stricter code quality checks)
+  "RUF", # ruff-specific rules
+  "PYI", # stub file checks (`.pyi` style and correctness)
+  "N",   # pep8-naming (naming conventions, e.g., classes in PascalCase)
+  "PTH", # pathlib preferred over `os.path`, `open()`, etc.
+]
+
+[tool.ruff.format]
+quote-style = "preserve"
+docstring-code-format = true
+preview = true
+
+[tool.ruff.lint]
+preview = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]

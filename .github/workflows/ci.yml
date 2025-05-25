@@ -27,9 +27,7 @@ jobs:
           pip install .[lint]
 
       - name: Run pyupgrade
-        run: |
-          pyupgrade --py312-plus src/boox/**/*.py
-          pyupgrade --py312-plus tests/**/*.py
+        run: find . -name '*.py' -exec pyupgrade --py312-plus {} +
 
       - name: Run ruff
         run: ruff check src/boox/

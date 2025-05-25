@@ -1,5 +1,10 @@
 # 📖 pyBooxDrop
 
+![CI](https://github.com/filipgodlewski/pyBooxDrop/actions/workflows/ci.yml/badge.svg)
+[![PyPI version](https://img.shields.io/pypi/v/booxdrop.svg)](https://pypi.org/project/booxdrop/)
+[![Python Version](https://img.shields.io/pypi/pyversions/booxdrop.svg)](https://pypi.org/project/booxdrop/)
+[![License](https://img.shields.io/pypi/l/booxdrop.svg)](https://github.com/filipgodlewski/pyBooxDrop/blob/main/LICENSE)
+
 A simple, unofficial Python library and CLI for Onyx BooxDrop.
 If you’re not a fan of the official app,
 here’s a cleaner, modern, and easy-to-use alternative —

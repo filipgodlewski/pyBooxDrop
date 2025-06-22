@@ -58,5 +58,18 @@ preview = true
 preview = true
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["src"]
+testpaths = "tests"
+pythonpath = "src"
+
+[tool.basedpyright]
+include = ["src", "tests"]
+exclude = [".git", ".venv", "__pycache__", "build", "dist"]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.12"
+typeCheckingMode = "strict"
+diagnosticMode = "workspace"
+executionEnvironments = [
+  { root = "src", reportUnusedFunction = true },
+  { root = ".", reportUnusedFunction = false },
+]

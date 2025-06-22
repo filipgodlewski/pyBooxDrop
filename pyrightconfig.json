@@ -1,9 +1,0 @@
-{
-  "include": ["boox", "cli.py", "tests"],
-  "exclude": [".git", ".venv", "__pycache__", "build", "dist"],
-  "venvPath": ".",
-  "venv": ".venv",
-  "pythonVersion": "3.12",
-  "typeCheckingMode": "strict",
-  "diagnosticMode": "workspace"
-}

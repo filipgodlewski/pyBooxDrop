@@ -11,52 +11,48 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.12]
+        python-version: [3.12, 3.13]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install .[lint]
+      - name: Install lint dependencies
+        run: uv sync --no-dev --extra lint
 
       - name: Run pyupgrade
-        run: find . -name '*.py' -exec pyupgrade --py312-plus {} +
+        run: find src tests -name '*.py' | xargs uvx pyupgrade --py312-plus
 
       - name: Run ruff
-        run: ruff check src/boox/
+        run: uvx ruff check --no-fix
 
       - name: Run bandit
-        run: bandit -r src/boox/
+        run: uvx bandit -r src
 
   test:
     name: Test
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.12]
+        python-version: [3.12, 3.13]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install .[test]
+      - name: Install test dependencies
+        run: uv sync
 
       - name: Run pytest
-        run: pytest
+        run: uvx pytest
 
   test-release:
     name: TestPyPI Release
@@ -66,21 +62,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v6
         with:
           python-version: 3.12
 
       - name: Install build dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install .[release]
+        run: uv sync --no-dev --extra release
 
       - name: Build package
-        run: python -m build
+        run: uv run python -m build
 
       - name: Publish to Test PyPI
         env:
           TWINE_USERNAME: __token__
           TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        run: twine upload --repository testpypi dist/*
+        run: uvx twine upload --repository testpypi dist/*

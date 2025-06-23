@@ -1,20 +1,27 @@
 [project]
-name = "pyBooxDrop"
-version = "0.1.0"
-description = "A simple, unofficial Python library and CLI for Onyx BooxDrop."
+name = "pybooxdrop"
+version = "0.1.1"
+description = "A simple, unofficial Python API library for Onyx BooxDrop."
 authors = [
   { name = "Filip Godlewski", email = "54432731+filipgodlewski@users.noreply.github.com" },
 ]
+readme = "README.md"
+license = { text = "MIT" }
+keywords = ["boox", "onyx", "ebook", "api", "reader"]
+classifiers = [
+  "Programming Language :: Python :: 3.12",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+]
 requires-python = ">=3.12"
-dependencies = ["httpx", "pydantic", "typer[all]", "structlog"]
+dependencies = ["httpx>=0.28.1", "pydantic>=2.11.5"]
+
+[dependency-groups]
+dev = ["basedpyright>=1.29.4", "pytest>=8.3.5", "respx>=0.22.0"]
 
 [project.optional-dependencies]
-lint = ["bandit", "pyupgrade", "ruff"]
-test = ["pytest", "respx"]
-release = ["build", "twine"]
-
-[project.scripts]
-boox = "src.boox.cli:app"
+lint = ["bandit>=1.8.5", "pyupgrade>=3.20.0", "ruff>=0.12.0"]
+release = ["build>=1.2.2.post1", "twine>=6.1.0"]
 
 [build-system]
 requires = ["setuptools", "wheel"]
@@ -26,6 +33,14 @@ line-length = 120
 unsafe-fixes = true
 fix = true
 respect-gitignore = true
+
+[tool.ruff.format]
+quote-style = "preserve"
+docstring-code-format = true
+preview = true
+
+[tool.ruff.lint]
+preview = true
 extend-select = [
   "E",   # pycodestyle (style issues)
   "F",   # pyflakes (error detection)
@@ -42,14 +57,19 @@ extend-select = [
   "PTH", # pathlib preferred over `os.path`, `open()`, etc.
 ]
 
-[tool.ruff.format]
-quote-style = "preserve"
-docstring-code-format = true
-preview = true
-
-[tool.ruff.lint]
-preview = true
-
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["src"]
+testpaths = "tests"
+pythonpath = "src"
+
+[tool.basedpyright]
+include = ["src", "tests"]
+exclude = [".git", ".venv", "__pycache__", "build", "dist"]
+venvPath = "."
+venv = ".venv"
+pythonVersion = "3.12"
+typeCheckingMode = "strict"
+diagnosticMode = "workspace"
+executionEnvironments = [
+  { root = "src", reportUnusedFunction = true },
+  { root = ".", reportUnusedFunction = false },
+]

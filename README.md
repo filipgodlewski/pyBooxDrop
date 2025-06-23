@@ -34,6 +34,19 @@ Basic example of using the library:
 # TODO: sample code
 ```
 
+## Development
+
+Please use `[astral-sh/uv](https://github.com/astral-sh/uv)` for your development.
+Be aware that the CI lint job depends on the packages found in "lint" extra.
+
+Sync uv with the following command:
+
+```bash
+uv sync
+# OR
+uv sync --extra lint
+```
+
 ## Contributing
 
 Contributions are welcome!

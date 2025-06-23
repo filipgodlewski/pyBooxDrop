@@ -33,6 +33,14 @@ line-length = 120
 unsafe-fixes = true
 fix = true
 respect-gitignore = true
+
+[tool.ruff.format]
+quote-style = "preserve"
+docstring-code-format = true
+preview = true
+
+[tool.ruff.lint]
+preview = true
 extend-select = [
   "E",   # pycodestyle (style issues)
   "F",   # pyflakes (error detection)
@@ -48,14 +56,6 @@ extend-select = [
   "N",   # pep8-naming (naming conventions, e.g., classes in PascalCase)
   "PTH", # pathlib preferred over `os.path`, `open()`, etc.
 ]
-
-[tool.ruff.format]
-quote-style = "preserve"
-docstring-code-format = true
-preview = true
-
-[tool.ruff.lint]
-preview = true
 
 [tool.pytest.ini_options]
 testpaths = "tests"

@@ -1,8 +1,9 @@
 import pytest
 
-from boox.client import Client
+from boox.client import BooxClient
+from boox.models.enums import BooxDomain
 
 
 @pytest.fixture(scope="session")
-def client():
-    return Client(token="dummy-token")
+def client_without_token():
+    return BooxClient(url=BooxDomain.EUR)

@@ -1,12 +1,12 @@
 from abc import ABC
 from typing import ClassVar
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, RootModel
 
 from boox.models.enums import BooxDomain
 
 
-class BooxApiUrl(BaseModel):
+class BooxApiUrl(RootModel[BooxDomain]):
     """A helper model for generating proper API url.
 
     Attributes:
@@ -15,12 +15,10 @@ class BooxApiUrl(BaseModel):
     """
 
     model_config: ClassVar[ConfigDict] = ConfigDict(frozen=True, use_enum_values=True)
-
-    domain: BooxDomain
-    version: int = Field(default=1, strict=True, ge=1, description="API version. Currently only `1` is supported.")
+    root: BooxDomain
 
     def __str__(self) -> str:
-        return f"https://{self.domain}/api/{self.version}"
+        return f"https://{self.root}/api/1"
 
     def __repr__(self) -> str:
         return f"{self.__class__.__name__}({str(self)!r})"

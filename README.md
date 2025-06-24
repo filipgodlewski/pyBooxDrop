@@ -30,7 +30,10 @@ pip install pybooxdrop
 ## 🚀 Quickstart
 
 ```python
-# TODO: sample code
+from boox.client import BooxClient
+
+# Given it is the very first connection, and no token is available:
+client = BooxClient(url="eur.boox.com")
 ```
 
 ---

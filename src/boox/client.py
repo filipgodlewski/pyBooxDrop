@@ -13,6 +13,9 @@ class BooxClient:
     Example usages:
         >>> # Given it is the very first connection, and no token is available:
         >>> client = BooxClient(url="eur.boox.com")
+        >>> payload = {"mobi": "foo@bar.com"}
+        >>> client.users.send_verification_code(payload=payload)
+        SendVerifyResponse(<0: SUCCESS>)
     """
 
     @validate_call()

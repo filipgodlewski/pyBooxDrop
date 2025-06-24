@@ -34,6 +34,8 @@ from boox.client import BooxClient
 
 # Given it is the very first connection, and no token is available:
 client = BooxClient(url="eur.boox.com")
+payload = {"mobi": "foo@bar.com"}
+_ = client.users.send_verification_code(payload=payload)
 ```
 
 ---

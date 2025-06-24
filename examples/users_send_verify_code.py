@@ -16,10 +16,15 @@ from boox.client import BooxClient
 # Example 1: robust
 from boox.models.base import BooxApiUrl
 from boox.models.enums import BooxDomain
+from boox.models.users import SendVerifyCodeRequest
 
 client = BooxClient(url=BooxApiUrl(BooxDomain.EUR))
+payload = SendVerifyCodeRequest(mobi="foo@bar.com")
+_ = client.users.send_verification_code(payload=payload)
 
 # Example 2: simplified
 # pyright: reportArgumentType=false
 
 client = BooxClient(url="eur.boox.com")
+payload = {"mobi": "foo@bar.com"}
+_ = client.users.send_verification_code(payload=payload)

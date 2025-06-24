@@ -9,12 +9,17 @@ if TYPE_CHECKING:
 
 
 class UsersApi:
-    @validate_call()
-    def __init__(self, session: BooxClient) -> None:
+    """API wrappers for users/ endpoint family.
+
+    NOTE: Since BooxClient class already has UsersApi in its context,
+    it is not recommended to use UsersApi as a standalone object.
+    """
+
+    def __init__(self, session: "BooxClient") -> None:
         self._session = session
 
     @validate_call()
-    def send_verification_code(self, payload: SendVerifyCodeRequest) -> SendVerifyResponse:
+    def send_verification_code(self, *, payload: SendVerifyCodeRequest) -> SendVerifyResponse:
         """Initial call to get the verification code.
 
         Depending on the payload, it will either send the verification code on provided e-mail or phone number.
@@ -31,7 +36,7 @@ class UsersApi:
             payload (SendVerifyCodeRequest): The validated payload to be sent in order to receive the verification code.
 
         Returns:
-            GenericResponse: The validated, generic response that is always received from the server.
+            SendVerifyResponse: The validated, generic response that is always received from the server.
         """
         with self._session.client as client:
             response = client.post("users/sendVerifyCode", json=payload.model_dump_json())

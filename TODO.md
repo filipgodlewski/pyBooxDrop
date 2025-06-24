@@ -2,5 +2,5 @@
 
 - [x] add a way to cleanly send verification code
 - [ ] add tests that prove it
-- [ ] add examples/
-- [ ] update README.md
+- [x] add examples/
+- [x] update README.md

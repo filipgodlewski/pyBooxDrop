@@ -4,6 +4,7 @@ from boox.api.users import UsersApi
 from boox.client import BooxClient
 from boox.models.users import SendVerifyCodeRequest, SendVerifyResponse
 from tests.conftest import e2e
+from tests.utils import EmailProvider
 
 
 def test_boox_client_initializes_users_api(client: BooxClient):
@@ -26,4 +27,9 @@ def test_send_verification_code(respx_mock: respx.MockRouter, client: BooxClient
 
 
 @e2e
-def test_send_verification_code_e2e(): ...
+def test_send_verification_code_e2e(e2e_client: BooxClient, email: EmailProvider):
+    payload = SendVerifyCodeRequest(mobi=email.address)
+
+    response = e2e_client.users.send_verification_code(payload=payload)
+    assert response.data == "ok"
+    # TODO: connect to smtp and fetch the email, confirm that the code is here

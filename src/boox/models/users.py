@@ -34,7 +34,7 @@ class SendVerifyCodeRequest(BaseModel):
 
     model_config: ClassVar[ConfigDict] = ConfigDict(frozen=True, str_strip_whitespace=True)
 
-    mobi: Annotated[str, StringConstraints(min_length=1)]
+    mobi: Annotated[str, StringConstraints(min_length=6)]
     area_code: Annotated[str, StringConstraints(min_length=2, pattern=r"^\+\d+$")] | None = Field(default=None)
     scene: str = ""
     verify: str = ""

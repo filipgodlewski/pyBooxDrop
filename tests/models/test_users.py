@@ -23,7 +23,7 @@ def fail_mobi_validation(data: dict[str, str]) -> str:
 
 def test_validation_fails_when_mobi_is_empty_string():
     message = fail_mobi_validation({"mobi": ""})
-    assert message == "String should have at least 1 character"
+    assert message == "String should have at least 6 characters"
 
 
 def test_validation_requires_area_code_for_phone_number():

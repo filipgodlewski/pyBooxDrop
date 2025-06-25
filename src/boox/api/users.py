@@ -26,6 +26,7 @@ class UsersApi:
         For phone numbers, works internationally, depending on the provided area code.
 
         The verification code is valid for 5 minutes.
+        The official BOOXDrop service has a 1 minute countdown before you can resend the code (for a particular method).
 
         Since this method is used **before** authentication, it has to be a staticmethod.
         Luckily, it is not necessary to use it every single time, because the tokens received after verification

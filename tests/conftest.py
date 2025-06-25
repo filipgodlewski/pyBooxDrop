@@ -11,12 +11,7 @@ e2e = pytest.mark.e2e
 
 
 def pytest_addoption(parser: "Parser"):
-    parser.addoption(
-        "--run-e2e",
-        action="store_true",
-        default=False,
-        help="run end-to-end tests",
-    )
+    parser.addoption("--run-e2e", action="store_true", default=False, help="run end-to-end tests")
 
 
 def pytest_collection_modifyitems(config: "Config", items: list["Item"]) -> None:

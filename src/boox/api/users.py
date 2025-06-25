@@ -42,5 +42,5 @@ class UsersApi:
         with self._session.client as client:
             response = client.post("users/sendVerifyCode", json=payload.model_dump_json())
 
-        data = response.raise_for_status().text
+        data = response.raise_for_status().json()
         return SendVerifyResponse.model_validate_json(data)

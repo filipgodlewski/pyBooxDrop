@@ -70,3 +70,4 @@ markers = ["e2e: test requiring external API (connects to a real boox server)"]
 [tool.basedpyright]
 pythonVersion = "3.12"
 typeCheckingMode = "strict"
+allowedUntypedLibraries = ["respx"]

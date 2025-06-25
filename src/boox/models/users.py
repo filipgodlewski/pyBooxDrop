@@ -1,19 +1,17 @@
+import re
 from contextlib import suppress
 from typing import Annotated, ClassVar, Self
 
-from pydantic import (
-    BaseModel,
-    ConfigDict,
-    EmailStr,
-    Field,
-    StringConstraints,
-    ValidationError,
-    field_validator,
-    model_validator,
-    validate_email,
-)
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator, validate_email
+from pydantic_core import PydanticCustomError
 
 from boox.models.base import BaseResponse
+
+
+def soft_validate_email(value: str) -> bool:
+    with suppress(PydanticCustomError):
+        return bool(validate_email(value))
+    return False
 
 
 class SendVerifyCodeRequest(BaseModel):
@@ -35,25 +33,23 @@ class SendVerifyCodeRequest(BaseModel):
     """
 
     model_config: ClassVar[ConfigDict] = ConfigDict(frozen=True, str_strip_whitespace=True)
-    has_email: ClassVar[bool] = False
 
-    area_code: Annotated[str, StringConstraints(min_length=2, pattern=r"^\+\d+")] | None = Field(default=None)
-    mobi: Annotated[str, StringConstraints(pattern=r"\d+")] | EmailStr
+    mobi: Annotated[str, StringConstraints(min_length=1)]
+    area_code: Annotated[str, StringConstraints(min_length=2, pattern=r"^\+\d+$")] | None = Field(default=None)
     scene: str = ""
     verify: str = ""
 
-    @field_validator("mobi", mode="before")
-    @classmethod
-    def mark_email(cls, value: str) -> str:
-        with suppress(ValidationError):
-            _ = validate_email(value)
-            cls.has_email = True
-        return value
-
     @model_validator(mode="after")
     def check_area_code(self) -> Self:
-        if self.__class__.has_email and self.area_code:
-            raise ValueError("E-mail and area code are mutually exclusive. Maybe area_code should be None?")
+        is_phone = bool(re.fullmatch(r"\d+", self.mobi))
+        is_email = bool(soft_validate_email(self.mobi))
+
+        if not is_phone and not is_email:
+            raise ValueError("The `mobi` field must either be an e-mail or a phone number.")
+        if is_phone and not self.area_code:
+            raise ValueError("Area code must be provided if phone method is used.")
+        if is_email and self.area_code:
+            raise ValueError("E-mail and area code are mutually exclusive.")
         return self
 
 

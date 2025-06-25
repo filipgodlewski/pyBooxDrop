@@ -3,6 +3,7 @@ import respx
 from boox.api.users import UsersApi
 from boox.client import BooxClient
 from boox.models.users import SendVerifyCodeRequest, SendVerifyResponse
+from tests.conftest import e2e
 
 
 def test_boox_client_initializes_users_api(client: BooxClient):
@@ -22,3 +23,7 @@ def test_send_verification_code(respx_mock: respx.MockRouter, client: BooxClient
     assert isinstance(result, SendVerifyResponse)
     assert result.data == "ok"
     assert str(result) == "<0: SUCCESS>"
+
+
+@e2e
+def test_send_verification_code_e2e(): ...

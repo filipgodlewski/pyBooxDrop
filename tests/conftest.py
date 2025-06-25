@@ -1,3 +1,4 @@
+import os
 from typing import TYPE_CHECKING
 
 import pytest
@@ -16,6 +17,9 @@ def pytest_addoption(parser: "Parser"):
 
 def pytest_collection_modifyitems(config: "Config", items: list["Item"]) -> None:
     if config.getoption("--run-e2e"):
+        required_env_variables = ["E2E_TARGET_DOMAIN", "SMTP_EMAIL", "SMTP_PASSWORD", "SMTP_HOST"]
+        if missing := [v for v in required_env_variables if not os.getenv(v)]:
+            pytest.exit(f"Missing required environment variables for --run-e2e: {", ".join(missing)}")
         return
 
     skip_e2e = pytest.mark.skip(reason="use --run-e2e to run end-to-end tests")

@@ -42,7 +42,28 @@ _ = client.users.send_verification_code(payload=payload)
 
 ## 🧪 Testing
 
-TODO: add description
+### Running unit tests
+
+```bash
+# to run all but e2e tests do the following:
+uv sync
+uvx pytest
+```
+
+### Running E2E tests
+
+Please note that since the E2E tests are heavy, require real internet connection,
+and they connect with the real BOOXDrop server, it is not
+recommended to run them often.
+
+```bash
+# required environment variables:
+# E2E_SMTP_EMAIL - the e-mail address on smtp.dev
+# E2E_SMTP_X_API_KEY - the X-API-KEY for the account
+# E2E_TARGET_DOMAIN - the target BOOXDrop domain, e.g. push.boox.com
+uv sync
+uvx pytest --e2e
+```
 
 ---
 

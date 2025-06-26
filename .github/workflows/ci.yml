@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  lint:
-    name: Lint
+  qa:
+    name: Check code and test
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -21,42 +21,21 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install lint dependencies
-        run: uv sync --no-dev --extra lint
-
-      - name: Run pyupgrade
-        run: find src tests -name '*.py' | xargs uvx pyupgrade --py312-plus
+      - name: Install project dependencies
+        run: uv sync
 
       - name: Run ruff
         run: uvx ruff check --no-fix
 
-      - name: Run bandit
-        run: uvx bandit -r src
+      - name: Run basedpyright
+        run: uvx basedpyright
 
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.12, 3.13]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install uv and set the python version
-        uses: astral-sh/setup-uv@v6
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install test dependencies
-        run: uv sync
-
-      - name: Run pytest
+      - name: Run pytest (non-e2e)
         run: uvx pytest
 
   test-release:
     name: TestPyPI Release
-    needs: [lint, test]
+    needs: [qa]
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     steps:

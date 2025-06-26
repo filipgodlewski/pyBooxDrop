@@ -17,7 +17,7 @@ def pytest_addoption(parser: "Parser"):
 
 def pytest_collection_modifyitems(config: "Config", items: list["Item"]) -> None:
     if config.getoption("--run-e2e"):
-        required_env_variables = ["E2E_TARGET_DOMAIN", "SMTP_EMAIL", "SMTP_PASSWORD", "SMTP_HOST"]
+        required_env_variables = ["E2E_SMTP_EMAIL", "E2E_SMTP_X_API_KEY", "E2E_TARGET_DOMAIN"]
         if missing := [v for v in required_env_variables if not os.getenv(v)]:
             pytest.exit(f"Missing required environment variables for --run-e2e: {", ".join(missing)}")
         return

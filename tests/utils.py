@@ -3,6 +3,5 @@ import os
 
 class EmailProvider:
     def __init__(self) -> None:
-        self.address = os.environ["SMTP_EMAIL"]
-        self.password = os.environ["SMTP_PASSWORD"]
-        self.host = os.environ["SMTP_HOST"]
+        self.address = os.environ["E2E_SMTP_EMAIL"]
+        self.x_api_key = os.environ["E2E_SMTP_X_API_KEY"]

@@ -8,17 +8,17 @@ from boox.models.enums import BooxDomain
 from tests.utils import EmailProvider
 
 
-@pytest.fixture()
+@pytest.fixture
 def client():
     return BooxClient(url=BooxApiUrl(BooxDomain.EUR))
 
 
-@pytest.fixture()
+@pytest.fixture
 def email():
     return EmailProvider()
 
 
-@pytest.fixture()
+@pytest.fixture
 def e2e_client():
     domain = BooxDomain(os.environ["E2E_TARGET_DOMAIN"])
     client = BooxClient(url=BooxApiUrl(domain))

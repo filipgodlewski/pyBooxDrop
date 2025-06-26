@@ -31,7 +31,6 @@ target-version = "py312"
 line-length = 120
 unsafe-fixes = true
 fix = true
-respect-gitignore = true
 
 [tool.ruff.format]
 quote-style = "preserve"
@@ -41,20 +40,34 @@ preview = true
 [tool.ruff.lint]
 preview = true
 extend-select = [
-  "E",   # pycodestyle (style issues)
-  "F",   # pyflakes (error detection)
-  "I",   # isort (import sorting)
-  "UP",  # pyupgrade (modern Python syntax)
-  "B",   # flake8-bugbear (likely bugs and code smells)
-  "C4",  # flake8-comprehensions (comprehension optimizations)
-  "TID", # flake8-tidy-imports (import restrictions and tidiness)
-  "SIM", # flake8-simplify (simplifiable code patterns)
-  "PL",  # pylint rules (stricter code quality checks)
-  "RUF", # ruff-specific rules
-  "PYI", # stub file checks (`.pyi` style and correctness)
-  "N",   # pep8-naming (naming conventions, e.g., classes in PascalCase)
-  "PTH", # pathlib preferred over `os.path`, `open()`, etc.
+  "A",    # flake8-builtins (shadowing Python built-ins)
+  "B",    # flake8-bugbear (likely bugs and code smells)
+  "BLE",  # flake8-blind-except (avoid bare `except:` blocks)
+  "C4",   # flake8-comprehensions (comprehension optimizations)
+  "DOC",  # pydoclint (docstring style and completeness)
+  "DTZ",  # flake8-datetimez (timezone-aware datetime checks)
+  "EM",   # flake8-errmsg (consistent and informative error messages)
+  "ERA",  # eradicate (commented-out code)
+  "FBT",  # flake8-boolean-trap (avoid boolean positional args)
+  "FLY",  # flynt (f-string conversion suggestions)
+  "FURB", # refurb (code simplifications and refactors)
+  "I",    # isort (import sorting)
+  "N",    # pep8-naming (naming conventions, e.g., classes in PascalCase)
+  "PERF", # perflint (performance anti-patterns)
+  "PL",   # pylint rules (stricter code quality checks)
+  "PT",   # flake8-pytest-style (pytest best practices)
+  "PTH",  # pathlib preferred over `os.path`, `open()`, etc.
+  "RUF",  # ruff-specific rules (internal consistency, edge cases)
+  "S",    # flake8-bandit (security issues and audit checks)
+  "SIM",  # flake8-simplify (simplifiable code patterns)
+  "T10",  # flake8-debugger (use of `pdb`, `ipdb`, `breakpoint()`)
+  "TID",  # flake8-tidy-imports (import restrictions and tidiness)
+  "TRY",  # tryceratops (anti-patterns in exception handling)
+  "UP",   # pyupgrade (modern Python syntax)
 ]
+
+[tool.ruff.per-file-ignores]
+"tests/*" = ["S101"]
 
 [tool.pytest.ini_options]
 testpaths = "tests"

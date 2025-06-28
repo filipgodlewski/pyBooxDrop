@@ -60,7 +60,7 @@ class EmailProvider:
         if not self.client.is_closed:
             self.client.close()
 
-    @with_retry(retries=3, delay=1, exceptions=(HTTPStatusError, IndexError, KeyError))
+    @with_retry(retries=5, delay=1, exceptions=(HTTPStatusError, IndexError, KeyError))
     def _get_mailbox_url(self) -> str:
         response = self.client.get("accounts")
         data = response.raise_for_status().json()
@@ -70,7 +70,7 @@ class EmailProvider:
         inbox = next(filter(lambda m: m["path"] == "INBOX", mailboxes))
         return inbox["@id"]
 
-    @with_retry(retries=3, delay=1, exceptions=(HTTPStatusError, IndexError, KeyError))
+    @with_retry(retries=5, delay=1, exceptions=(HTTPStatusError, IndexError, KeyError))
     def _get_message_url(self) -> str:
         if not self.messages_url:
             raise ValueError("No INBOX messages url obtained yet")
@@ -81,7 +81,7 @@ class EmailProvider:
         member: dict[str, str] = data["member"][0]
         return f"{self.messages_url}/{member["id"]}"
 
-    @with_retry(retries=3, delay=3, exceptions=(HTTPStatusError, IndexError, KeyError))
+    @with_retry(retries=10, delay=1, exceptions=(HTTPStatusError, IndexError, KeyError))
     def _get_newest_message(self) -> str:
         if not self.newest_message_url:
             raise ValueError("No newest message url obtained yet")
@@ -91,7 +91,7 @@ class EmailProvider:
 
         return data["text"]
 
-    def get_verification_code(self) -> str:
+    def get_newest_message(self) -> str:
         mailbox_url = self._get_mailbox_url()
         self.messages_url = f"{mailbox_url}/messages"
         self.newest_message_url = self._get_message_url()

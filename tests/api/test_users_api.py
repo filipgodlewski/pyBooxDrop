@@ -34,6 +34,6 @@ def test_send_verification_code_e2e(client: BooxClient, email: EmailProvider):
 
     response = client.users.send_verification_code(payload=payload)
     assert response.data == "ok"
-    message = email.get_verification_code()
+    message = email.get_newest_message()
     match = re.compile(r"^The code is (\d{6}) for account verification from BOOX.").match(message)
     assert match, "Did not match the received email"

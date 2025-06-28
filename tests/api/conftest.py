@@ -15,7 +15,7 @@ from tests.utils import EmailProvider
 def client(request: SubRequest) -> Iterator[BooxClient]:
     """A client used for mocked and E2E tests.
 
-    Used as a session manager to utilize the keep-alive functionality.
+    Used as a context manager to utilize the keep-alive functionality.
 
     Yields:
         Iterator[BooxClient]: A client that can be used for api testing.

@@ -7,12 +7,7 @@ from boox.models.enums import BooxDomain
 
 
 class BooxApiUrl(RootModel[BooxDomain]):
-    """A helper model for generating proper API url.
-
-    Attributes:
-        domain (BooxDomain): The server the account is registered on.
-        version (int): The API version. Currently only v1 is officially published.
-    """
+    """A helper model for generating proper API url."""
 
     model_config: ClassVar[ConfigDict] = ConfigDict(frozen=True, use_enum_values=True)
     root: BooxDomain

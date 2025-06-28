@@ -32,4 +32,5 @@ def test_send_verification_code_e2e(e2e_client: BooxClient, email: EmailProvider
 
     response = e2e_client.users.send_verification_code(payload=payload)
     assert response.data == "ok"
-    # TODO: connect to smtp and fetch the email, confirm that the code is here
+    message = email.get_verification_code()
+    assert "Your one-time sign-in code" in message

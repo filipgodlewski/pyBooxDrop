@@ -1,4 +1,6 @@
 import os
+from collections.abc import Iterator
+from contextlib import suppress
 
 import pytest
 
@@ -14,8 +16,11 @@ def client():
 
 
 @pytest.fixture
-def email():
-    return EmailProvider()
+def email() -> Iterator[EmailProvider]:
+    provider = EmailProvider()
+    yield provider
+    with suppress(ValueError):
+        provider.try_delete_message()
 
 
 @pytest.fixture

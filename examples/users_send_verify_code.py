@@ -18,13 +18,19 @@ from boox.models.base import BooxApiUrl
 from boox.models.enums import BooxDomain
 from boox.models.users import SendVerifyCodeRequest
 
-client = BooxClient(url=BooxApiUrl(BooxDomain.EUR))
-payload = SendVerifyCodeRequest(mobi="foo@bar.com")
-_ = client.users.send_verification_code(payload=payload)
+with BooxClient(url=BooxApiUrl(BooxDomain.EUR)) as client:
+    payload = SendVerifyCodeRequest(mobi="foo@bar.com")
+    _ = client.users.send_verification_code(payload=payload)
 
 # Example 2: simplified
 # pyright: reportArgumentType=false
 
+# Here, in this example I don't use a context manager, and I close the connection manually.
+# It does not mean that you have to use it like that.
+# In fact, I highly recommend using BooxClient as a context manager.
+# This is similar to using builtins.open().
+
 client = BooxClient(url="eur.boox.com")
 payload = {"mobi": "foo@bar.com"}
 _ = client.users.send_verification_code(payload=payload)
+client.close()

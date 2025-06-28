@@ -17,6 +17,13 @@ automate uploads/downloads, or plug it into your own tools and scripts.
 - Fully typed (with `pydantic`) and 100% modern Python 3.12+
 - Open-source, MIT-licensed, built with readability in mind
 
+<details>
+  <summary>Supported endpoints</summary>
+
+- POST `/users/sendVerifyCode`
+
+</details>
+
 ---
 
 ## 📦 Installation

@@ -1,11 +1,11 @@
-name: release
+name: test-release
 
 on:
   workflow_dispatch:
 
 jobs:
-  release:
-    name: PyPI Release
+  test-release:
+    name: Test PyPI Release
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
     steps:
@@ -22,7 +22,7 @@ jobs:
       - name: Build package
         run: uv build
 
-      - name: Publish to PyPI
+      - name: Publish to Test PyPI
         env:
-          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
-        run: uv publish
+          UV_PUBLISH_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        run: uv publish --index testpypi

@@ -32,27 +32,3 @@ jobs:
 
       - name: Run pytest (non-e2e)
         run: uv run pytest
-
-  test-release:
-    name: TestPyPI Release
-    needs: [qa]
-    runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install uv and set the python version
-        uses: astral-sh/setup-uv@v6
-        with:
-          python-version: 3.12
-
-      - name: Install build dependencies
-        run: uv sync
-
-      - name: Build package
-        run: uv build
-
-      - name: Publish to Test PyPI
-        env:
-          UV_PUBLISH_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        run: uv publish --index testpypi

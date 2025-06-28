@@ -72,6 +72,18 @@ uv sync
 uv run pytest -m e2e --e2e
 ```
 
+The E2E_SMTP_EMAIL must lead to an e-mail that is connected to a real Boox account.
+It must be verified prior to the tests.
+
+E2E_TARGET_DOMAIN is the domain that the Boox account is used with.
+AFAIK it can be any Boox' domain, because the account is not bound to any in particular.
+This might change in the future though,
+so I would rather play safe there.
+
+X-API-KEY for [SMTP.dev](https://smtp.dev/) is required,
+as this is the client that is being used.
+Currently there are no plans to support other providers.
+
 ---
 
 ## 📮 Feedback

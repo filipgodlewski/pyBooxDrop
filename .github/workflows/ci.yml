@@ -6,8 +6,8 @@ on:
       - main
 
 jobs:
-  lint:
-    name: Lint
+  qa:
+    name: Check code and test
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -21,42 +21,21 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Install lint dependencies
-        run: uv sync --no-dev --extra lint
-
-      - name: Run pyupgrade
-        run: find src tests -name '*.py' | xargs uvx pyupgrade --py312-plus
-
-      - name: Run ruff
-        run: uvx ruff check --no-fix
-
-      - name: Run bandit
-        run: uvx bandit -r src
-
-  test:
-    name: Test
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        python-version: [3.12, 3.13]
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install uv and set the python version
-        uses: astral-sh/setup-uv@v6
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install test dependencies
+      - name: Install project dependencies
         run: uv sync
 
-      - name: Run pytest
-        run: uvx pytest
+      - name: Run ruff
+        run: uv run ruff check --no-fix
+
+      - name: Run basedpyright
+        run: uv run basedpyright
+
+      - name: Run pytest (non-e2e)
+        run: uv run pytest
 
   test-release:
     name: TestPyPI Release
-    needs: [lint, test]
+    needs: [qa]
     runs-on: ubuntu-latest
     if: github.event.pull_request.merged == true
     steps:
@@ -68,13 +47,12 @@ jobs:
           python-version: 3.12
 
       - name: Install build dependencies
-        run: uv sync --no-dev --extra release
+        run: uv sync
 
       - name: Build package
-        run: uv run python -m build
+        run: uv build
 
       - name: Publish to Test PyPI
         env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        run: uvx twine upload --repository testpypi dist/*
+          UV_PUBLISH_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        run: uv publish --index testpypi

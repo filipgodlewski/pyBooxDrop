@@ -17,6 +17,13 @@ automate uploads/downloads, or plug it into your own tools and scripts.
 - Fully typed (with `pydantic`) and 100% modern Python 3.12+
 - Open-source, MIT-licensed, built with readability in mind
 
+<details>
+  <summary>Supported endpoints</summary>
+
+- POST `/users/sendVerifyCode`
+
+</details>
+
 ---
 
 ## 📦 Installation
@@ -30,14 +37,59 @@ pip install pybooxdrop
 ## 🚀 Quickstart
 
 ```python
-# TODO: sample code
+from boox.client import BooxClient
+
+# Given it is the very first connection, and no token is available:
+with BooxClient(url="eur.boox.com") as client:
+    payload = {"mobi": "foo@bar.com"}
+    _ = client.users.send_verification_code(payload=payload)
+
+# OR, if you don't want to use the context manager
+
+client = BooxClient(url="eur.boox.com")
+payload = {"mobi": "foo@bar.com"}
+_ = client.users.send_verification_code(payload=payload)
+client.close()
 ```
 
 ---
 
 ## 🧪 Testing
 
-TODO: add description
+### Running unit tests
+
+```bash
+# to run all but e2e tests do the following:
+uv sync
+uv run pytest
+```
+
+### Running E2E tests
+
+Please note that since the E2E tests are heavy, require real internet connection,
+and they connect with the real BOOXDrop server, it is not
+recommended to run them often.
+
+```bash
+# required environment variables:
+# E2E_SMTP_EMAIL - the e-mail address on smtp.dev
+# E2E_SMTP_X_API_KEY - the X-API-KEY for the account
+# E2E_TARGET_DOMAIN - the target BOOXDrop domain, e.g. push.boox.com
+uv sync
+uv run pytest -m e2e --e2e
+```
+
+The E2E_SMTP_EMAIL must lead to an e-mail that is connected to a real Boox account.
+It must be verified prior to the tests.
+
+E2E_TARGET_DOMAIN is the domain that the Boox account is used with.
+AFAIK it can be any Boox' domain, because the account is not bound to any in particular.
+This might change in the future though,
+so I would rather play safe there.
+
+X-API-KEY for [SMTP.dev](https://smtp.dev/) is required,
+as this is the client that is being used.
+Currently there are no plans to support other providers.
 
 ---
 

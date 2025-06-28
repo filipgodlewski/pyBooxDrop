@@ -1,0 +1,29 @@
+name: e2e
+
+on:
+  workflow_dispatch:
+
+jobs:
+  e2e:
+    name: E2E tests on a real server
+    runs-on: ubuntu-latest
+    environment: e2e
+    if: github.event_name == 'workflow_dispatch'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv and set the python version
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: 3.12
+
+      - name: Install test dependencies
+        run: uv sync
+
+      - name: Run pytest
+        run: uv run pytest -m e2e --e2e
+        env:
+          E2E_SMTP_EMAIL: ${{ secrets.E2E_SMTP_EMAIL }}
+          E2E_SMTP_X_API_KEY: ${{ secrets.E2E_SMTP_X_API_KEY }}
+          E2E_TARGET_DOMAIN: ${{ secrets.E2E_TARGET_DOMAIN }}

@@ -33,9 +33,16 @@ pip install pybooxdrop
 from boox.client import BooxClient
 
 # Given it is the very first connection, and no token is available:
+with BooxClient(url="eur.boox.com") as client:
+    payload = {"mobi": "foo@bar.com"}
+    _ = client.users.send_verification_code(payload=payload)
+
+# OR, if you don't want to use the context manager
+
 client = BooxClient(url="eur.boox.com")
 payload = {"mobi": "foo@bar.com"}
 _ = client.users.send_verification_code(payload=payload)
+client.close()
 ```
 
 ---

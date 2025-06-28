@@ -107,4 +107,4 @@ class EmailProvider:
         messages: list[dict[str, str]] = data["member"]
         message_ids = [m["id"] for m in messages]
         for message_id in message_ids:
-            self.client.delete(f"{self.messages_url}/{message_id}")
+            self.client.delete(f"{self.messages_url}/{message_id}").raise_for_status()

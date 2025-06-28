@@ -1,5 +1,6 @@
 import os
 import time
+import warnings
 from collections.abc import Callable
 from functools import wraps
 from typing import ParamSpec, TypeVar
@@ -41,12 +42,27 @@ class EmailProvider:
         headers = {"X-API-KEY": x_api_key, "accept": "application/ld+json"}
         base_url = "https://api.smtp.dev"
         self.client = Client(base_url=base_url, headers=headers)
-        self.message_url: str | None = None
+        self.messages_url: str | None = None
+        self.newest_message_url: str | None = None
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        self.close()
+
+    def __del__(self):
+        if not self.client.is_closed:
+            warnings.warn("EmailProvider was not closed explicitly", ResourceWarning, stacklevel=2)
+            self.close()
+
+    def close(self):
+        if not self.client.is_closed:
+            self.client.close()
 
     @with_retry(retries=3, delay=1, exceptions=(HTTPStatusError, IndexError, KeyError))
     def _get_mailbox_url(self) -> str:
-        with self.client as client:
-            response = client.get("accounts")
+        response = self.client.get("accounts")
         data = response.raise_for_status().json()
 
         member = data["member"][0]
@@ -55,33 +71,40 @@ class EmailProvider:
         return inbox["@id"]
 
     @with_retry(retries=3, delay=1, exceptions=(HTTPStatusError, IndexError, KeyError))
-    def _get_message_url(self, endpoint_url: str) -> str:
-        with self.client as client:
-            response = client.get(endpoint_url)
+    def _get_message_url(self) -> str:
+        if not self.messages_url:
+            raise ValueError("No INBOX messages url obtained yet")
+
+        response = self.client.get(self.messages_url)
         data = response.raise_for_status().json()
 
         member: dict[str, str] = data["member"][0]
-        return f"{endpoint_url}/{member["id"]}"
+        return f"{self.messages_url}/{member["id"]}"
 
     @with_retry(retries=3, delay=3, exceptions=(HTTPStatusError, IndexError, KeyError))
-    def _get_message(self) -> str:
-        if not self.message_url:
-            raise ValueError("No message url obtained yet")
+    def _get_newest_message(self) -> str:
+        if not self.newest_message_url:
+            raise ValueError("No newest message url obtained yet")
 
-        with self.client as client:
-            response = client.get(self.message_url)
-
+        response = self.client.get(self.newest_message_url)
         data = response.raise_for_status().json()
+
         return data["text"]
 
     def get_verification_code(self) -> str:
         mailbox_url = self._get_mailbox_url()
-        self.message_url = self._get_message_url(f"{mailbox_url}/messages")
-        return self._get_message()
+        self.messages_url = f"{mailbox_url}/messages"
+        self.newest_message_url = self._get_message_url()
+        return self._get_newest_message()
 
-    def try_delete_message(self):
-        if not self.message_url:
-            raise ValueError("No message url obtained yet")
+    def cleanup_inbox(self):
+        if not self.messages_url:
+            raise ValueError("No INBOX messages url obtained yet")
 
-        with self.client as client:
-            client.delete(self.message_url)
+        response = self.client.get(self.messages_url)
+        data = response.raise_for_status().json()
+
+        messages: list[dict[str, str]] = data["member"]
+        message_ids = [m["id"] for m in messages]
+        for message_id in message_ids:
+            self.client.delete(f"{self.messages_url}/{message_id}")

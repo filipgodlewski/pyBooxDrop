@@ -1,3 +1,5 @@
+import re
+
 import respx
 
 from boox.api.users import UsersApi
@@ -27,10 +29,11 @@ def test_send_verification_code(respx_mock: respx.MockRouter, client: BooxClient
 
 
 @e2e
-def test_send_verification_code_e2e(e2e_client: BooxClient, email: EmailProvider):
+def test_send_verification_code_e2e(client: BooxClient, email: EmailProvider):
     payload = SendVerifyCodeRequest(mobi=email.address)
 
-    response = e2e_client.users.send_verification_code(payload=payload)
+    response = client.users.send_verification_code(payload=payload)
     assert response.data == "ok"
     message = email.get_verification_code()
-    assert "Your one-time sign-in code" in message
+    match = re.compile(r"^The code is (\d{6}) for account verification from BOOX.").match(message)
+    assert match, "Did not match the received email"

@@ -9,9 +9,9 @@ if TYPE_CHECKING:
 
 
 class UsersApi:
-    """API wrappers for users/ endpoint family.
+    """API wrappers for `users` endpoint family.
 
-    NOTE: Since BooxClient class already has UsersApi in its context,
+    Note that since BooxClient class already has UsersApi in its context,
     it is not recommended to use UsersApi as a standalone object.
     """
 
@@ -39,8 +39,6 @@ class UsersApi:
         Returns:
             SendVerifyResponse: The validated, generic response that is always received from the server.
         """
-        with self._session.client as client:
-            response = client.post("users/sendVerifyCode", json=payload.model_dump(exclude_unset=True))
-
+        response = self._session.client.post("users/sendVerifyCode", json=payload.model_dump(exclude_unset=True))
         data = response.raise_for_status().json()
         return SendVerifyResponse.model_validate(data)

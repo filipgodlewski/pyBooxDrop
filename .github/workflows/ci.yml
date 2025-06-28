@@ -25,13 +25,13 @@ jobs:
         run: uv sync
 
       - name: Run ruff
-        run: uvx ruff check --no-fix
+        run: uv run ruff check --no-fix
 
       - name: Run basedpyright
-        run: uvx basedpyright
+        run: uv run basedpyright
 
       - name: Run pytest (non-e2e)
-        run: uvx pytest
+        run: uv run pytest
 
   test-release:
     name: TestPyPI Release
@@ -47,13 +47,12 @@ jobs:
           python-version: 3.12
 
       - name: Install build dependencies
-        run: uv sync --no-dev --extra release
+        run: uv sync
 
       - name: Build package
-        run: uv run python -m build
+        run: uv build
 
       - name: Publish to Test PyPI
         env:
-          TWINE_USERNAME: __token__
-          TWINE_PASSWORD: ${{ secrets.TEST_PYPI_API_TOKEN }}
-        run: uvx twine upload --repository testpypi dist/*
+          UV_PUBLISH_TOKEN: ${{ secrets.TEST_PYPI_API_TOKEN }}
+        run: uv publish --index testpypi

@@ -47,7 +47,7 @@ _ = client.users.send_verification_code(payload=payload)
 ```bash
 # to run all but e2e tests do the following:
 uv sync
-uvx pytest
+uv run pytest
 ```
 
 ### Running E2E tests
@@ -62,7 +62,7 @@ recommended to run them often.
 # E2E_SMTP_X_API_KEY - the X-API-KEY for the account
 # E2E_TARGET_DOMAIN - the target BOOXDrop domain, e.g. push.boox.com
 uv sync
-uvx pytest --e2e
+uv run pytest -m e2e --e2e
 ```
 
 ---

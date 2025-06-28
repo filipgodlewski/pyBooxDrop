@@ -14,7 +14,7 @@ def test_boox_client_initializes_users_api(client: BooxClient):
 
 @respx.mock(assert_all_called=True, assert_all_mocked=True, base_url="https://eur.boox.com/api/1/")
 def test_send_verification_code(respx_mock: respx.MockRouter, client: BooxClient):
-    response = SendVerifyResponse(data="ok", message="SUCCESS", result_code=0).model_dump_json()
+    response = SendVerifyResponse(data="ok", message="SUCCESS", result_code=0).model_dump()
     route = respx_mock.post("users/sendVerifyCode").respond(json=response)
 
     payload = SendVerifyCodeRequest(mobi="foo@bar.com")

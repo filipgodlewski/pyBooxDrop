@@ -40,7 +40,7 @@ class UsersApi:
             SendVerifyResponse: The validated, generic response that is always received from the server.
         """
         with self._session.client as client:
-            response = client.post("users/sendVerifyCode", json=payload.model_dump_json())
+            response = client.post("users/sendVerifyCode", json=payload.model_dump(exclude_unset=True))
 
         data = response.raise_for_status().json()
-        return SendVerifyResponse.model_validate_json(data)
+        return SendVerifyResponse.model_validate(data)

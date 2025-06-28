@@ -188,7 +188,6 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "pydantic", extras = ["email"], specifier = ">=2.11.5" },
 ]
-provides-extras = ["release"]
 
 [package.metadata.requires-dev]
 dev = [

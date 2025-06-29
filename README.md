@@ -6,8 +6,8 @@
 [![License](https://img.shields.io/pypi/l/booxdrop.svg)](https://github.com/filipgodlewski/pyBooxDrop/blob/main/LICENSE)
 
 🐍 A friendly Python wrapper for the BOOXDrop API — unofficial, but built with care.
-📚 Great if you want to manage files on your BOOX device programmatically,
-automate uploads/downloads, or plug it into your own tools and scripts.
+📚 Great if you want to manage files on your BOOX device programmatically, automate uploads/downloads,
+or plug it into your own tools and scripts.
 
 ---
 
@@ -18,6 +18,7 @@ automate uploads/downloads, or plug it into your own tools and scripts.
 - Open-source, MIT-licensed, built with readability in mind
 
 <details>
+
   <summary>Supported endpoints</summary>
 
 - POST `/users/sendVerifyCode`
@@ -34,10 +35,10 @@ pip install pybooxdrop
 
 ---
 
-## 🚀 Quickstart
+## 🚀 Quick start
 
 ```python
-from boox.client import BooxClient
+from boox import BooxClient
 
 # Given it is the very first connection, and no token is available:
 with BooxClient(url="eur.boox.com") as client:
@@ -67,8 +68,7 @@ uv run pytest
 ### Running E2E tests
 
 Please note that since the E2E tests are heavy, require real internet connection,
-and they connect with the real BOOXDrop server, it is not
-recommended to run them often.
+and they connect with the real BOOXDrop server, it is not recommended to run them often.
 
 ```bash
 # required environment variables:
@@ -84,11 +84,9 @@ It must be verified prior to the tests.
 
 E2E_TARGET_DOMAIN is the domain that the Boox account is used with.
 AFAIK it can be any Boox' domain, because the account is not bound to any in particular.
-This might change in the future though,
-so I would rather play safe there.
+This might change in the future though, so I would rather play safe there.
 
-X-API-KEY for [SMTP.dev](https://smtp.dev/) is required,
-as this is the client that is being used.
+X-API-KEY for [SMTP.dev](https://smtp.dev/) is required, as this is the client that is being used.
 Currently there are no plans to support other providers.
 
 ---
@@ -112,11 +110,9 @@ Contributions are welcome!
 
 ## 🫶 Special thanks
 
-Big thanks to [hrw](https://github.com/hrw)
-for the project [onyx-send2boox](https://github.com/hrw/onyx-send2boox).
+Big thanks to [hrw](https://github.com/hrw) for the project [onyx-send2boox](https://github.com/hrw/onyx-send2boox).
 The project was the main inspiration behind this library.
-While pyBooxDrop is a fresh, focused take on just the API,
-this project wouldn’t exist without this awesome groundwork.
+While pyBooxDrop is a fresh, focused take on just the API, this project wouldn’t exist without this awesome groundwork.
 
 Thanks for the great job!
 

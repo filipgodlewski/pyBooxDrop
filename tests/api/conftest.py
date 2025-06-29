@@ -5,24 +5,24 @@ from contextlib import suppress
 import pytest
 from _pytest.fixtures import SubRequest
 
-from boox.client import BooxClient
+from boox.client import Boox
 from boox.models.base import BooxApiUrl
 from boox.models.enums import BooxDomain
 from tests.utils import EmailProvider
 
 
 @pytest.fixture(scope="session")
-def client(request: SubRequest) -> Iterator[BooxClient]:
+def client(request: SubRequest) -> Iterator[Boox]:
     """A client used for mocked and E2E tests.
 
     Used as a context manager to utilize the keep-alive functionality.
 
     Yields:
-        Iterator[BooxClient]: A client that can be used for api testing.
+        Iterator[Boox]: A client that can be used for api testing.
     """
 
     domain = os.environ["E2E_TARGET_DOMAIN"] if request.config.getoption("--e2e") else BooxDomain.EUR
-    with BooxClient(url=BooxApiUrl(BooxDomain(domain))) as client:
+    with Boox(base_url=BooxApiUrl(BooxDomain(domain))) as client:
         yield client
 
 

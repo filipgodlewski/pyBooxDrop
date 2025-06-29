@@ -5,17 +5,17 @@ from pydantic import validate_call
 from boox.models.users import SendVerifyCodeRequest, SendVerifyResponse
 
 if TYPE_CHECKING:
-    from boox.client import BooxClient
+    from boox.client import Boox
 
 
 class UsersApi:
     """API wrappers for `users` endpoint family.
 
-    Note that since BooxClient class already has UsersApi in its context,
+    Note that since Boox class already has UsersApi in its context,
     it is not recommended to use UsersApi as a standalone object.
     """
 
-    def __init__(self, session: "BooxClient") -> None:
+    def __init__(self, session: "Boox") -> None:
         self._session = session
 
     @validate_call()

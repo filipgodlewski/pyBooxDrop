@@ -11,14 +11,14 @@ You probably are ok with the simplified version.
 Mix and match however you like.
 """
 
-from boox.client import BooxClient
+from boox.client import Boox
 
 # Example 1: robust
 from boox.models.base import BooxApiUrl
 from boox.models.enums import BooxDomain
 from boox.models.users import SendVerifyCodeRequest
 
-with BooxClient(url=BooxApiUrl(BooxDomain.EUR)) as client:
+with Boox(base_url=BooxApiUrl(BooxDomain.EUR)) as client:
     payload = SendVerifyCodeRequest(mobi="foo@bar.com")
     _ = client.users.send_verification_code(payload=payload)
 
@@ -27,10 +27,10 @@ with BooxClient(url=BooxApiUrl(BooxDomain.EUR)) as client:
 
 # Here, in this example I don't use a context manager, and I close the connection manually.
 # It does not mean that you have to use it like that.
-# In fact, I highly recommend using BooxClient as a context manager.
+# In fact, I highly recommend using Boox as a context manager.
 # This is similar to using builtins.open().
 
-client = BooxClient(url="eur.boox.com")
+client = Boox(base_url="eur.boox.com")
 payload = {"mobi": "foo@bar.com"}
 _ = client.users.send_verification_code(payload=payload)
 client.close()

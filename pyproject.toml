@@ -17,7 +17,7 @@ requires-python = ">=3.12"
 dependencies = ["httpx>=0.28.1", "pydantic[email]>=2.11.5"]
 
 [dependency-groups]
-dev = ["basedpyright>=1.29.4", "pytest>=8.3.5", "respx>=0.22.0", "ruff>=0.12.0"]
+dev = ["basedpyright>=1.29.4", "pytest==8.4.1", "respx>=0.22.0", "ruff>=0.12.0"]
 
 # In the future, consider using uv_build backend once it's stable
 [build-system]

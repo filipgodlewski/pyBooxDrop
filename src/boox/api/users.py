@@ -33,7 +33,6 @@ class UsersApi:
         are expiring every 20 days.
 
         Args:
-            base_url (BooxApiUrl): The url to the server the account is registered on.
             payload (SendVerifyCodeRequest): The validated payload to be sent in order to receive the verification code.
 
         Returns:

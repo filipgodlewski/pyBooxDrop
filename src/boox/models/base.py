@@ -1,22 +1,6 @@
 from abc import ABC
-from typing import ClassVar
 
-from pydantic import BaseModel, ConfigDict, RootModel
-
-from boox.models.enums import BooxUrl
-
-
-class BooxApiUrl(RootModel[BooxDomain]):
-    """A helper model for generating proper API url."""
-
-    model_config: ClassVar[ConfigDict] = ConfigDict(frozen=True, use_enum_values=True)
-    root: BooxUrl
-
-    def __str__(self) -> str:
-        return f"https://{self.root}/api/1"
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({str(self)!r})"
+from pydantic import BaseModel
 
 
 class BaseResponse[T](BaseModel, ABC):

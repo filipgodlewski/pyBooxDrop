@@ -6,8 +6,7 @@ import pytest
 from _pytest.fixtures import SubRequest
 
 from boox.client import Boox
-from boox.models.base import BooxApiUrl
-from boox.models.enums import BooxDomain
+from boox.models.enums import BooxUrl
 from tests.utils import EmailProvider
 
 
@@ -21,8 +20,8 @@ def client(request: SubRequest) -> Iterator[Boox]:
         Iterator[Boox]: A client that can be used for api testing.
     """
 
-    domain = os.environ["E2E_TARGET_DOMAIN"] if request.config.getoption("--e2e") else BooxDomain.EUR
-    with Boox(base_url=BooxApiUrl(BooxDomain(domain))) as client:
+    domain = os.environ["E2E_TARGET_DOMAIN"] if request.config.getoption("--e2e") else BooxUrl.EUR
+    with Boox(base_url=BooxUrl(domain)) as client:
         yield client
 
 

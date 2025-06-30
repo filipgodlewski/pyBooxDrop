@@ -5,7 +5,7 @@ import httpx
 from pydantic import SecretStr, validate_call
 
 from boox.api.users import UsersApi
-from boox.models.base import BooxApiUrl
+from boox.models.enums import BooxUrl
 
 
 class Boox:
@@ -22,14 +22,16 @@ class Boox:
         httpx library, upon leaving the context manager, terminates the connection.
 
         >>> # Given it is the very first connection, and no token is available:
-        >>> with Boox(url="eur.boox.com") as client:
+        >>> with Boox(base_url="https://eur.boox.com/api/1/") as client:
         ...     payload = {"mobi": "foo@bar.com"}
         ...     client.users.send_verification_code(payload=payload)
         SendVerifyResponse(<0: SUCCESS>)
 
         Example 2, closing the connection manually. It is not recommended, but it's not my job to stop you from that.
+        Notice that you can also use BooxUrl enum to not rely on strings for the base_url
 
-        >>> client = Boox(url="eur.boox.com")
+        >>> from boox.models.enums import BooxUrl
+        >>> client = Boox(base_url=BooxUrl.EUR)
         >>> payload = {"mobi": "foo@bar.com"}
         >>> client.users.send_verification_code(payload=payload)
         SendVerifyResponse(<0: SUCCESS>)
@@ -37,8 +39,9 @@ class Boox:
     """
 
     @validate_call()
-    def __init__(self, *, base_url: BooxApiUrl, token: SecretStr | None = None) -> None:
+    def __init__(self, *, base_url: BooxUrl, token: SecretStr | None = None) -> None:
         self.client = httpx.Client(base_url=str(base_url))
+        self.base_url = base_url
         self.token: SecretStr = token or SecretStr("")
         self.users = UsersApi(self)
 

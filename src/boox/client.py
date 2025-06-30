@@ -44,12 +44,6 @@ class Boox:
         self.token: SecretStr = token or SecretStr("")
         self.users = UsersApi(self)
 
-    def __str__(self) -> str:
-        return f"BooxDrop through {self.base_url}"
-
-    def __repr__(self) -> str:
-        return f"{self.__class__.__name__}(url={self.base_url}, has_token={bool(self.token)})"
-
     def __enter__(self):
         return self
 

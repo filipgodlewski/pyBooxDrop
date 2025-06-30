@@ -8,9 +8,12 @@ from boox.models.enums import BooxUrl
 
 
 def test_invalid_boox_domain_is_not_allowed():
-    with pytest.raises(ValidationError) as err:
+    def shows_all_members(e: ValidationError) -> bool:
+        errors = e.errors(include_url=False, include_context=False, include_input=False)
+        return all(m.value in errors[0]["msg"] for m in list(BooxUrl))
+
+    with pytest.raises(ValidationError, match=r"Input should be", check=shows_all_members):
         Boox(base_url="https://foo.com")  # pyright: ignore[reportArgumentType]
-    assert all(m.value in str(err) for m in BooxUrl)
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))

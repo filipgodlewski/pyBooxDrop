@@ -1,10 +1,9 @@
 import warnings
 
-import httpx
-from pydantic import SecretStr, validate_call
+from pydantic import validate_call
 
 from boox.api.users import UsersApi
-from boox.models.enums import BooxUrl
+from boox.models.protocols import HttpClient
 
 
 class Boox:
@@ -38,10 +37,8 @@ class Boox:
     """
 
     @validate_call()
-    def __init__(self, *, base_url: BooxUrl, token: SecretStr | None = None) -> None:
-        self.client = httpx.Client(base_url=str(base_url))
-        self.base_url = base_url
-        self.token: SecretStr = token or SecretStr("")
+    def __init__(self, client: HttpClient) -> None:
+        self.client = client
         self.users = UsersApi(self)
 
     def __enter__(self):

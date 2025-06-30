@@ -45,11 +45,11 @@ class SendVerifyCodeRequest(BaseModel):
         is_email = bool(soft_validate_email(self.mobi))
 
         if not is_phone and not is_email:
-            raise ValueError("The `mobi` field must either be an e-mail or a phone number.")
+            raise ValueError("mobi field must either be an e-mail or a phone number")
         if is_phone and not self.area_code:
-            raise ValueError("Area code must be provided if phone method is used.")
+            raise ValueError("area_code must be provided if phone method is used")
         if is_email and self.area_code:
-            raise ValueError("E-mail and area code are mutually exclusive.")
+            raise ValueError("mobi and area_code are mutually exclusive")
         return self
 
 

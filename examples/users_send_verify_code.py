@@ -14,11 +14,10 @@ Mix and match however you like.
 from boox.client import Boox
 
 # Example 1: robust
-from boox.models.base import BooxApiUrl
-from boox.models.enums import BooxDomain
+from boox.models.enums import BooxUrl
 from boox.models.users import SendVerifyCodeRequest
 
-with Boox(base_url=BooxApiUrl(BooxDomain.EUR)) as client:
+with Boox(base_url=BooxUrl.EUR) as client:
     payload = SendVerifyCodeRequest(mobi="foo@bar.com")
     _ = client.users.send_verification_code(payload=payload)
 

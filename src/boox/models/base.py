@@ -3,14 +3,14 @@ from typing import ClassVar
 
 from pydantic import BaseModel, ConfigDict, RootModel
 
-from boox.models.enums import BooxDomain
+from boox.models.enums import BooxUrl
 
 
 class BooxApiUrl(RootModel[BooxDomain]):
     """A helper model for generating proper API url."""
 
     model_config: ClassVar[ConfigDict] = ConfigDict(frozen=True, use_enum_values=True)
-    root: BooxDomain
+    root: BooxUrl
 
     def __str__(self) -> str:
         return f"https://{self.root}/api/1"

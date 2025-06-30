@@ -1,4 +1,3 @@
-import re
 import warnings
 
 import httpx
@@ -46,18 +45,10 @@ class Boox:
         self.users = UsersApi(self)
 
     def __str__(self) -> str:
-        return f"{self.__class__.__name__} on {self.client.base_url!s}"
+        return f"BooxDrop through {self.base_url}"
 
     def __repr__(self) -> str:
-        host = self.client.base_url.host
-        path = self.client.base_url.path
-        match = re.compile(r"\d+").search(path)
-        if not match:
-            raise ValueError("No api version found in the base url!")
-
-        api_version = match.group()
-        has_token = bool(self.token)
-        return f"{self.__class__.__name__}({host=}, {api_version=}, {has_token=})"
+        return f"{self.__class__.__name__}(url={self.base_url}, has_token={bool(self.token)})"
 
     def __enter__(self):
         return self

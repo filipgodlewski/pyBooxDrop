@@ -2,6 +2,7 @@ import gc
 
 import httpx
 import pytest
+import requests
 from pytest_mock import MockerFixture
 
 from boox.api.users import UsersApi
@@ -80,3 +81,13 @@ def test_httpx_client_can_be_used_as_boox_client():
 
 
 # TODO: test Client(base_url=...)
+
+
+def test_requests_session_can_be_used_as_boox_client():
+    """An integration test simply checking if requests.Session can be used as a param.
+
+    Notice that requests.Session() doesn't have `.is_closed` attribute.
+    """
+    with (boox := Boox(client=requests.Session())):
+        pass
+    assert boox.is_closed

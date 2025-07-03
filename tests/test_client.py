@@ -1,5 +1,6 @@
 import gc
 
+import httpx
 import pytest
 from pytest_mock import MockerFixture
 
@@ -21,6 +22,13 @@ def test_boox_is_closed_after_context_exit(mocker: MockerFixture):
     with (boox := Boox(client=mocked_client)):
         pass
     assert boox.is_closed
+
+
+def test_boox_client_exposed_in_context(mocker: MockerFixture):
+    mocked_client = mocker.Mock(spec=HttpClient)
+
+    with Boox(client=mocked_client) as boox:
+        assert boox.client is mocked_client
 
 
 def test_boox_warns_if_not_closed(mocker: MockerFixture):
@@ -61,3 +69,14 @@ def test_boox_users_api_is_initialized(mocker: MockerFixture):
 
     boox = Boox(client=mocked_client)
     assert isinstance(boox.users, UsersApi)
+
+
+def test_httpx_client_can_be_used_as_boox_client():
+    """An integration test simply checking if httpx.Client can be used as a param."""
+    with (boox := Boox(client=(real_client := httpx.Client()))):
+        pass
+    assert boox.is_closed
+    assert real_client.is_closed
+
+
+# TODO: test Client(base_url=...)

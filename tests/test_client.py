@@ -1,41 +1,63 @@
-import uuid
+import gc
 
 import pytest
-from pydantic import ValidationError
+from pytest_mock import MockerFixture
 
+from boox.api.users import UsersApi
 from boox.client import Boox
-from boox.models.enums import BooxUrl
+from boox.models.protocols import HttpClient
 
 
-def test_invalid_boox_domain_is_not_allowed():
-    def shows_all_members(e: ValidationError) -> bool:
-        errors = e.errors(include_url=False, include_context=False, include_input=False)
-        return all(m.value in errors[0]["msg"] for m in list(BooxUrl))
+def test_boox_is_not_closed_after_init(mocker: MockerFixture):
+    mocked_client = mocker.Mock(spec=HttpClient)
 
-    with pytest.raises(ValidationError, match=r"Input should be", check=shows_all_members):
-        Boox(base_url="https://foo.com")  # pyright: ignore[reportArgumentType]
+    boox = Boox(client=mocked_client)
+    assert boox.is_closed is False
 
 
-@pytest.mark.parametrize("url", list(BooxUrl))
-def test_valid_boox_domain_as_string_is_allowed(url: BooxUrl):
-    client = Boox(base_url=url)  # pyright: ignore[reportArgumentType]
-    assert client.base_url == url
+def test_boox_is_closed_after_context_exit(mocker: MockerFixture):
+    mocked_client = mocker.Mock(spec=HttpClient)
+
+    with (boox := Boox(client=mocked_client)):
+        pass
+    assert boox.is_closed
 
 
-@pytest.mark.parametrize("url", list(BooxUrl))
-def test_client_str_representation(url: BooxUrl):
-    client = Boox(base_url=url)
-    assert str(client) == f"BooxDrop through {url}"
+def test_boox_warns_if_not_closed(mocker: MockerFixture):
+    mocked_client = mocker.Mock(spec=HttpClient)
+
+    boox = Boox(client=mocked_client)
+    del boox
+    with pytest.warns(ResourceWarning, match="Boox client was not closed explicitly"):
+        gc.collect()
 
 
-@pytest.mark.parametrize("url", list(BooxUrl))
-def test_client_repr_without_token(url: BooxUrl):
-    client = Boox(base_url=url)
-    assert repr(client) == f"Boox(url={url.value}, has_token=False)"
+def test_boox_close_calls_internal_method(mocker: MockerFixture):
+    mocked_client = mocker.Mock(spec=HttpClient)
+    boox = Boox(client=mocked_client)
+    mock_close = mocker.patch.object(boox, "close")
+
+    boox.close()
+    mock_close.assert_called_once()
 
 
-@pytest.mark.parametrize("url", list(BooxUrl))
-def test_client_repr_with_token(url: BooxUrl):
-    token = uuid.uuid1()
-    client = Boox(base_url=url, token=str(token))  # pyright: ignore[reportArgumentType]
-    assert repr(client) == f"Boox(url={url.value}, has_token=True)"
+def test_boox_raises_on_closed_client(mocker: MockerFixture):
+    mocked_client = mocker.Mock(spec=HttpClient)
+    mocked_client.is_closed = True
+
+    with pytest.raises(ValueError, match="Cannot initialize Boox with a client which has a closed connection"):
+        Boox(client=mocked_client)
+
+
+def test_boox_client_is_assigned_properly(mocker: MockerFixture):
+    mocked_client = mocker.Mock(spec=HttpClient)
+
+    boox = Boox(client=mocked_client)
+    assert boox.client is mocked_client
+
+
+def test_boox_users_api_is_initialized(mocker: MockerFixture):
+    mocked_client = mocker.Mock(spec=HttpClient)
+
+    boox = Boox(client=mocked_client)
+    assert isinstance(boox.users, UsersApi)

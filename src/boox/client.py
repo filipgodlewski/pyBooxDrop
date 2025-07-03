@@ -1,6 +1,6 @@
 import warnings
 
-from pydantic import validate_call
+from pydantic import ConfigDict, validate_call
 
 from boox.api.users import UsersApi
 from boox.models.protocols import HttpClient
@@ -36,10 +36,15 @@ class Boox:
         >>> client.close()
     """
 
-    @validate_call()
+    @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
     def __init__(self, client: HttpClient) -> None:
         self.client = client
         self.users = UsersApi(self)
+        self._is_closed: bool = getattr(client, "is_closed", False)
+
+        if self._is_closed:
+            msg = f"Cannot initialize {self.__class__.__name__} with a client which has a closed connection"
+            raise ValueError(msg)
 
     def __enter__(self):
         return self
@@ -48,10 +53,17 @@ class Boox:
         self.close()
 
     def __del__(self):
-        if not self.client.is_closed:
-            warnings.warn("Boox was not closed explicitly", ResourceWarning, stacklevel=2)
+        if not self.is_closed:
+            warnings.warn("Boox client was not closed explicitly", ResourceWarning, stacklevel=2)
             self.close()
 
+    @property
+    def is_closed(self):
+        """Property to check whether a client's connection is closed."""
+        return self._is_closed
+
     def close(self):
-        if not self.client.is_closed:
+        """An explicit way of closing the Boox client."""
+        if not self.is_closed:
             self.client.close()
+            self._is_closed = True

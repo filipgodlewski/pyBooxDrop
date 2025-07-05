@@ -10,9 +10,13 @@ from boox.models.enums import BooxUrl
 from boox.models.protocols import HttpClient
 
 
-class BaseResponse:
+class BaseHttpResponse:
     def __init__(self, raw_response: bytes) -> None:
         self._raw_response = raw_response
+
+    @property
+    def status_code(self) -> int:
+
 
     def raise_for_status(self) -> Self: ...
 
@@ -20,12 +24,12 @@ class BaseResponse:
         return jsonlib.loads(self._content, **kwargs)
 
 
-class BaseClient:
-    def post(self, url: str, json: Any | None = None) -> BaseResponse:
+class BaseHttpClient:
+    def post(self, url: str, json: Any | None = None) -> BaseHttpResponse:
         data = jsonlib.dumps(json).encode("utf-8") if json else None
         req = request.Request(url=url, data=data, headers=self.headers, method="POST")
         with urllib.request.urlopen(req) as response:
-            return BaseResponse(response.read())
+            return BaseHttpResponse(response.read())
 
     def close(self) -> None:
         pass
@@ -72,7 +76,7 @@ class Boox:
 
         self._base_url: BooxUrl | None = base_url
         self._is_closed: bool = is_closed
-        self.client = client or BaseClient()
+        self.client = client or BaseHttpClient()
         self.users = UsersApi(self)
 
     def __enter__(self):

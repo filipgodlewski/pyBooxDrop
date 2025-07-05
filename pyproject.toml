@@ -21,7 +21,6 @@ dev = [
   "basedpyright>=1.29.4",
   "pytest==8.4.1",
   "pytest-mock>=3.14.1",
-  "requests>=2.32.4",
   "respx>=0.22.0",
   "ruff>=0.12.0",
 ]

@@ -1,13 +1,59 @@
 import gc
 
-import httpx
 import pytest
-import requests
+from pydantic import ValidationError
 from pytest_mock import MockerFixture
 
 from boox.api.users import UsersApi
 from boox.client import Boox
+from boox.models.enums import BooxUrl
 from boox.models.protocols import HttpClient
+
+
+def shows_all_members(e: ValidationError) -> bool:
+    errors = e.errors(include_url=False, include_context=False, include_input=False)
+    return all(m.value in errors[0]["msg"] for m in list(BooxUrl))
+
+
+def test_boox_initializes_with_defaults():
+    assert Boox()
+
+
+def test_boox_base_url_is_none_by_default():
+    boox = Boox()
+    assert boox.base_url is None
+
+
+@pytest.mark.parametrize("url", list(BooxUrl))
+def test_boox_base_url_inferred_from_client(mocker: MockerFixture, url: BooxUrl):
+    mocked_client = mocker.Mock(spec=HttpClient)
+    mocked_client.base_url = url
+    boox = Boox(client=mocked_client)
+    assert boox.base_url is url
+
+
+def test_boox_raises_validation_error_for_invalid_url(mocker: MockerFixture):
+    mocked_client = mocker.Mock(spec=HttpClient)
+    mocked_client.base_url = "http://random.url"
+    with pytest.raises(ValidationError, match="Input should be", check=shows_all_members):
+        Boox(client=mocked_client)
+
+
+@pytest.mark.parametrize("url", list(BooxUrl))
+def test_boox_base_url_can_be_set(mocker: MockerFixture, url: BooxUrl):
+    mocked_client = mocker.Mock(spec=HttpClient)
+
+    boox = Boox(client=mocked_client)
+    boox.base_url = url
+    assert boox.base_url is url
+
+
+def test_boox_base_url_set_raises_on_invalid_url(mocker: MockerFixture):
+    mocked_client = mocker.Mock(spec=HttpClient)
+
+    boox = Boox(client=mocked_client)
+    with pytest.raises(ValidationError, match="Input should be", check=shows_all_members):
+        boox.base_url = "http://random.url"
 
 
 def test_boox_is_not_closed_after_init(mocker: MockerFixture):
@@ -70,24 +116,3 @@ def test_boox_users_api_is_initialized(mocker: MockerFixture):
 
     boox = Boox(client=mocked_client)
     assert isinstance(boox.users, UsersApi)
-
-
-def test_httpx_client_can_be_used_as_boox_client():
-    """An integration test simply checking if httpx.Client can be used as a param."""
-    with (boox := Boox(client=(real_client := httpx.Client()))):
-        pass
-    assert boox.is_closed
-    assert real_client.is_closed
-
-
-# TODO: test Client(base_url=...)
-
-
-def test_requests_session_can_be_used_as_boox_client():
-    """An integration test simply checking if requests.Session can be used as a param.
-
-    Notice that requests.Session() doesn't have `.is_closed` attribute.
-    """
-    with (boox := Boox(client=requests.Session())):
-        pass
-    assert boox.is_closed

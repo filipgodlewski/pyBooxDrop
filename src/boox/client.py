@@ -1,9 +1,34 @@
+import json as jsonlib
 import warnings
+from typing import Any, Self
+from urllib import request
 
-from pydantic import ConfigDict, validate_call
+from pydantic import ConfigDict, TypeAdapter, validate_call
 
 from boox.api.users import UsersApi
+from boox.models.enums import BooxUrl
 from boox.models.protocols import HttpClient
+
+
+class BaseResponse:
+    def __init__(self, raw_response: bytes) -> None:
+        self._raw_response = raw_response
+
+    def raise_for_status(self) -> Self: ...
+
+    def json(self, **kwargs: Any) -> Any:
+        return jsonlib.loads(self._content, **kwargs)
+
+
+class BaseClient:
+    def post(self, url: str, json: Any | None = None) -> BaseResponse:
+        data = jsonlib.dumps(json).encode("utf-8") if json else None
+        req = request.Request(url=url, data=data, headers=self.headers, method="POST")
+        with urllib.request.urlopen(req) as response:
+            return BaseResponse(response.read())
+
+    def close(self) -> None:
+        pass
 
 
 class Boox:
@@ -37,14 +62,18 @@ class Boox:
     """
 
     @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
-    def __init__(self, client: HttpClient) -> None:
-        self.client = client
-        self.users = UsersApi(self)
-        self._is_closed: bool = getattr(client, "is_closed", False)
-
-        if self._is_closed:
+    def __init__(self, client: HttpClient | None = None) -> None:
+        if is_closed := getattr(client, "is_closed", False):
             msg = f"Cannot initialize {self.__class__.__name__} with a client which has a closed connection"
             raise ValueError(msg)
+
+        if base_url := getattr(client, "base_url", None):
+            base_url = TypeAdapter(BooxUrl).validate_python(base_url)
+
+        self._base_url: BooxUrl | None = base_url
+        self._is_closed: bool = is_closed
+        self.client = client or BaseClient()
+        self.users = UsersApi(self)
 
     def __enter__(self):
         return self
@@ -56,6 +85,15 @@ class Boox:
         if not self.is_closed:
             warnings.warn("Boox client was not closed explicitly", ResourceWarning, stacklevel=2)
             self.close()
+
+    @property
+    def base_url(self) -> BooxUrl | None:
+        return self._base_url
+
+    @base_url.setter
+    @validate_call()
+    def base_url(self, value: BooxUrl):
+        self._base_url = value
 
     @property
     def is_closed(self):

@@ -1,22 +1,15 @@
-from typing import TYPE_CHECKING
-
 from pydantic import validate_call
 
+from boox.api.core import Api
 from boox.models.users import SendVerifyCodeRequest, SendVerifyResponse
 
-if TYPE_CHECKING:
-    from boox.client import Boox
 
-
-class UsersApi:
+class UsersApi(Api):
     """API wrappers for `users` endpoint family.
 
     Note that since Boox class already has UsersApi in its context,
     it is not recommended to use UsersApi as a standalone object.
     """
-
-    def __init__(self, session: "Boox") -> None:
-        self._session = session
 
     @validate_call()
     def send_verification_code(self, *, payload: SendVerifyCodeRequest) -> SendVerifyResponse:
@@ -38,6 +31,5 @@ class UsersApi:
         Returns:
             SendVerifyResponse: The validated, generic response that is always received from the server.
         """
-        response = self._session.client.post("users/sendVerifyCode", json=payload.model_dump(exclude_unset=True))
-        data = response.raise_for_status().json()
-        return SendVerifyResponse.model_validate(data)
+        response = self._post(endpoint="/users/sendVerifyCode", json=payload.model_dump(exclude_unset=True))
+        return SendVerifyResponse.model_validate(response.json())

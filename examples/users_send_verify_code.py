@@ -11,7 +11,7 @@ You probably are ok with the simplified version.
 Mix and match however you like.
 """
 
-from boox.client import Boox
+from boox.core import Boox
 
 # Example 1: robust
 from boox.models.enums import BooxUrl

@@ -3,7 +3,7 @@ import re
 import respx
 
 from boox.api.users import UsersApi
-from boox.client import Boox
+from boox.core import Boox
 from boox.models.users import SendVerifyCodeRequest, SendVerifyResponse
 from tests.conftest import e2e
 from tests.utils import EmailProvider

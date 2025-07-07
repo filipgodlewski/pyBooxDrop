@@ -1,3 +1,4 @@
+from collections.abc import MutableMapping
 from typing import Any, Protocol, Self, runtime_checkable
 
 
@@ -17,6 +18,8 @@ class HttpResponse(Protocol):
 @runtime_checkable
 class HttpClient(Protocol):
     """The minimal requirement for a client to work with the Boox class."""
+
+    headers: Any | MutableMapping[str, str]
 
     def post(self, url: str, json: Any | None = None, *args: Any, **kwargs: Any) -> HttpResponse:
         """A method to request a `POST` type response."""

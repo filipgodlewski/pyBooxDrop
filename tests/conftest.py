@@ -1,7 +1,11 @@
 import os
 from typing import TYPE_CHECKING
+from unittest import mock
 
 import pytest
+from pytest_mock import MockerFixture
+
+from boox.models.protocols import HttpClient
 
 if TYPE_CHECKING:
     from _pytest.config import Config
@@ -26,3 +30,10 @@ def pytest_collection_modifyitems(config: "Config", items: list["Item"]) -> None
     for item in items:
         if "e2e" in item.keywords:
             item.add_marker(skip_e2e)
+
+
+@pytest.fixture
+def mocked_client(mocker: MockerFixture) -> mock.Mock:
+    client: mock.Mock = mocker.Mock(spec=HttpClient)
+    client.headers = {}
+    return client

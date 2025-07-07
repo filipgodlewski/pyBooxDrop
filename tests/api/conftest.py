@@ -1,9 +1,18 @@
 from collections.abc import Iterator
 from contextlib import suppress
+from unittest import mock
 
 import pytest
+from pytest_mock import MockerFixture
 
 from tests.utils import EmailProvider
+
+
+@pytest.fixture
+def mocked_boox(mocker: MockerFixture) -> mock.Mock:
+    boox: mock.Mock = mocker.Mock()
+    boox.base_url = None
+    return boox
 
 
 @pytest.fixture(scope="session")

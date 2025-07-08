@@ -5,8 +5,6 @@ from unittest import mock
 import pytest
 from pytest_mock import MockerFixture
 
-from boox.models.protocols import HttpClient
-
 if TYPE_CHECKING:
     from _pytest.config import Config
     from _pytest.config.argparsing import Parser
@@ -34,6 +32,8 @@ def pytest_collection_modifyitems(config: "Config", items: list["Item"]) -> None
 
 @pytest.fixture
 def mocked_client(mocker: MockerFixture) -> mock.Mock:
-    client: mock.Mock = mocker.Mock(spec=HttpClient)
+    client: mock.Mock = mocker.Mock()
+    client.is_closed = False
+    client.base_url = None
     client.headers = {}
     return client

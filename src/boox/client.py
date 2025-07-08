@@ -65,5 +65,15 @@ class BaseHttpClient:
         request = self._build_request("POST", url, json)
         return self._send(request)
 
+    @validate_call()
+    def get(self, url: str) -> BaseHttpResponse:
+        request = self._build_request("POST", url, None)
+        return self._send(request)
+
+    @validate_call()
+    def delete(self, url: str) -> BaseHttpResponse:
+        request = self._build_request("DELETE", url, None)
+        return self._send(request)
+
     def close(self) -> None:
         pass

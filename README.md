@@ -79,7 +79,7 @@ class MyAdapter(HttpClient):
         # your logic using requests, httpx, or anything else
         ...
 
-boox = Boox(client=MyAdapter(httpx.Client()))
+with Boox(client=MyAdapter(httpx.Client())) as boox: ...
 ```
 
 </details>

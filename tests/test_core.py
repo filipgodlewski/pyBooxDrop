@@ -22,53 +22,55 @@ def test_boox_initializes_with_defaults():
 
 
 def test_boox_base_url_is_none_by_default():
-    boox = Boox()
-    assert boox.base_url is None
+    with Boox() as boox:
+        assert boox.base_url is None
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
 def test_boox_base_url_inferred_from_client(mocked_client: mock.Mock, url: BooxUrl):
     mocked_client.base_url = url
-    boox = Boox(client=mocked_client)
-    assert boox.base_url is url
+    with Boox(client=mocked_client) as boox:
+        assert boox.base_url is url
 
 
 def test_explicit_base_url_takes_precedence(mocked_client: mock.Mock):
     url_taking_precedence = BooxUrl.EUR
-    boox = Boox(client=mocked_client, base_url=url_taking_precedence)
-    assert boox.base_url is url_taking_precedence
+    with Boox(client=mocked_client, base_url=url_taking_precedence) as boox:
+        assert boox.base_url is url_taking_precedence
 
 
 def test_client_base_url_overrides_constructor_value(mocked_client: mock.Mock):
     url_taking_precedence = BooxUrl.EUR
     url_not_taking_precedence = BooxUrl.PUSH
     mocked_client.base_url = url_taking_precedence
-    boox = Boox(client=mocked_client, base_url=url_not_taking_precedence)
-    assert boox.base_url is url_taking_precedence
+    with Boox(client=mocked_client, base_url=url_not_taking_precedence) as boox:
+        assert boox.base_url is url_taking_precedence
 
 
 def test_boox_raises_validation_error_for_invalid_url(mocked_client: mock.Mock):
     mocked_client.base_url = "http://random.url"
-    with pytest.raises(ValidationError, match="Input should be", check=shows_all_members):
-        Boox(client=mocked_client)
+    with pytest.raises(ValidationError, match="Input should be", check=shows_all_members), Boox(client=mocked_client):
+        pass
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
 def test_boox_base_url_can_be_set(mocked_client: mock.Mock, url: BooxUrl):
-    boox = Boox(client=mocked_client)
-    boox.base_url = url
+    with Boox(client=mocked_client) as boox:
+        boox.base_url = url
     assert boox.base_url == url.value
 
 
 def test_boox_base_url_set_raises_on_invalid_url(mocked_client: mock.Mock):
-    boox = Boox(client=mocked_client)
-    with pytest.raises(ValidationError, match="Input should be", check=shows_all_members):
+    with (
+        Boox(client=mocked_client) as boox,
+        pytest.raises(ValidationError, match="Input should be", check=shows_all_members),
+    ):
         boox.base_url = "http://random.url"  # pyright: ignore[reportAttributeAccessIssue]
 
 
 def test_boox_is_not_closed_after_init(mocked_client: mock.Mock):
-    boox = Boox(client=mocked_client)
-    assert boox.is_closed is False
+    with Boox(client=mocked_client) as boox:
+        assert boox.is_closed is False
 
 
 def test_boox_is_closed_after_context_exit(mocked_client: mock.Mock):
@@ -129,23 +131,23 @@ def test_boox_close_calls_internal_method(mocker: MockerFixture, mocked_client: 
 def test_boox_raises_on_closed_client(mocked_client: mock.Mock):
     mocked_client.is_closed = True
 
-    with pytest.raises(ValueError, match="Cannot initialize Boox with a client which has a closed connection"):
-        Boox(client=mocked_client)
+    with pytest.raises(ValueError, match="Cannot initialize Boox with a closed connection"), Boox(client=mocked_client):
+        pass
 
 
 def test_boox_client_is_assigned_properly(mocked_client: mock.Mock):
-    boox = Boox(client=mocked_client)
-    assert boox.client is mocked_client
+    with Boox(client=mocked_client) as boox:
+        assert boox.client is mocked_client
 
 
 def test_boox_users_api_is_initialized(mocked_client: mock.Mock):
-    boox = Boox(client=mocked_client)
-    assert isinstance(boox.users, UsersApi)
+    with Boox(client=mocked_client) as boox:
+        assert isinstance(boox.users, UsersApi)
 
 
 def test_boox_sets_default_headers(mocked_client: mock.Mock):
-    boox = Boox(client=mocked_client)
-    assert boox.client.headers == {
-        "User-Agent": f"python-boox/{version("pybooxdrop")}",
-        "Content-Type": "application/json",
-    }
+    with Boox(client=mocked_client) as boox:
+        assert boox.client.headers == {
+            "User-Agent": f"python-boox/{version("pybooxdrop")}",
+            "Content-Type": "application/json",
+        }

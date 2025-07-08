@@ -16,8 +16,8 @@ from tests.utils import EmailProvider
 
 # Move to test_core
 def test_boox_client_initializes_users_api(mocked_client: mock.Mock):
-    boox = Boox(client=mocked_client)
-    assert boox.users._session is boox
+    with Boox(client=mocked_client) as boox:
+        assert boox.users._session is boox
 
 
 def test_send_verification_code_calls_post_and_parses_response(mocker: MockerFixture):
@@ -43,11 +43,11 @@ def test_users_api_send_verification_code_integration(mocker: MockerFixture, moc
     mocked_response.raise_for_status.return_value = mocked_response
     mocked_client.post.return_value = mocked_response
 
-    boox = Boox(client=mocked_client)
-    boox.base_url = url
+    with Boox(client=mocked_client) as boox:
+        boox.base_url = url
 
-    payload = SendVerifyCodeRequest(mobi="foo@bar.com")
-    result = boox.users.send_verification_code(payload=payload)
+        payload = SendVerifyCodeRequest(mobi="foo@bar.com")
+        result = boox.users.send_verification_code(payload=payload)
 
     expected_url = url.value + "users/sendVerifyCode"
     expected_json = payload.model_dump(exclude_unset=True)

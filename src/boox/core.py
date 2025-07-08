@@ -36,15 +36,14 @@ class Boox:
 
     def __init__(self, client: HttpClient | None = None, base_url: BooxUrl | None = None) -> None:
         if is_closed := getattr(client, "is_closed", False):
-            msg = f"Cannot initialize {self.__class__.__name__} with a client which has a closed connection"
-            raise ValueError(msg)
+            raise ValueError("Cannot initialize Boox with a closed connection")
 
         if base_url := (getattr(client, "base_url", None) or base_url):
             base_url = TypeAdapter(BooxUrl).validate_python(base_url)
 
-        self._base_url: str | None = base_url
         self._is_closed: bool = is_closed
-        self.client = client or BaseHttpClient()
+        self._base_url: str | None = base_url
+        self.client: HttpClient = client or BaseHttpClient()
         self.users = UsersApi(self)
         self.client.headers.update({
             "User-Agent": f"python-boox/{version("pybooxdrop")}",
@@ -58,7 +57,7 @@ class Boox:
         self.close()
 
     def __del__(self):
-        if not self._is_closed:
+        if getattr(self, "is_closed", True) is False:
             warnings.warn(
                 "Boox client was not closed explicitly (neither via `with` nor `.close()`)",
                 ResourceWarning,
@@ -87,6 +86,6 @@ class Boox:
 
     def close(self):
         """An explicit way of closing the Boox client."""
-        if not self.is_closed:
+        if not self.is_closed and getattr(self, "client", None) is not None:
             self.client.close()
             self._is_closed = True

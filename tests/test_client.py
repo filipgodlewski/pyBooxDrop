@@ -5,9 +5,18 @@ import pytest
 from pytest_mock import MockerFixture
 
 from boox.client import BaseHttpClient, BaseHTTPError, BaseHttpResponse
+from tests.conftest import ExpectedResponseData
 
 SUCCESSES = (HTTPStatus.OK, HTTPStatus.CREATED, HTTPStatus.NO_CONTENT)
 FAILURES = (HTTPStatus.BAD_REQUEST, HTTPStatus.NOT_FOUND, HTTPStatus.INTERNAL_SERVER_ERROR)
+
+
+def assert_response(actual: BaseHttpResponse, expected_data: ExpectedResponseData):
+    assert isinstance(actual, BaseHttpResponse)
+    assert actual._code == expected_data.code
+    assert actual._url == expected_data.url
+    assert actual._headers == expected_data.headers
+    assert actual._content == expected_data.content
 
 
 @pytest.mark.parametrize("code", FAILURES)
@@ -62,42 +71,28 @@ def test_build_request_with_json_payload():
     assert request.get_method() == "POST"
 
 
-def test_send_populates_response_fields_correctly(mocker: MockerFixture):
-    mocked_response = mocker.Mock()
-    mocked_response.status = (code := HTTPStatus.OK)
-    mocked_response.geturl.return_value = (url := "https://foo.com/")
-    mocked_response.headers = (headers := {"X": "Y"})
-    mocked_response.read.return_value = (content := b'{"foo": "bar"}')
-
-    mocker.patch("boox.client.urlopen").return_value.__enter__.return_value = mocked_response
-
+def test_send_populates_response_fields_correctly(mocker: MockerFixture, mocked_urlopen: ExpectedResponseData):
     client = BaseHttpClient()
     response = client._send(request=mocker.Mock())
-
-    assert isinstance(response, BaseHttpResponse)
-    assert response._code == code
-    assert response._url == url
-    assert response._headers == headers
-    assert response._content == content
+    assert_response(response, mocked_urlopen)
 
 
-def test_post_populates_response_fields_correctly(mocker: MockerFixture):
-    mocked_response = mocker.Mock()
-    mocked_response.status = (code := HTTPStatus.OK)
-    mocked_response.geturl.return_value = (url := "https://foo.com/")
-    mocked_response.headers = (headers := {"X": "Y"})
-    mocked_response.read.return_value = (content := b'{"foo": "bar"}')
-
-    mocker.patch("boox.client.urlopen").return_value.__enter__.return_value = mocked_response
-
+def test_get_populates_response_fields_correctly(mocked_urlopen: ExpectedResponseData):
     client = BaseHttpClient()
-    response = client.post(url)
+    response = client.get(mocked_urlopen.url)
+    assert_response(response, mocked_urlopen)
 
-    assert isinstance(response, BaseHttpResponse)
-    assert response._code == code
-    assert response._url == url
-    assert response._headers == headers
-    assert response._content == content
+
+def test_post_populates_response_fields_correctly(mocked_urlopen: ExpectedResponseData):
+    client = BaseHttpClient()
+    response = client.post(mocked_urlopen.url)
+    assert_response(response, mocked_urlopen)
+
+
+def test_delete_populates_response_fields_correctly(mocked_urlopen: ExpectedResponseData):
+    client = BaseHttpClient()
+    response = client.delete(mocked_urlopen.url)
+    assert_response(response, mocked_urlopen)
 
 
 # pyright: reportPrivateUsage=false

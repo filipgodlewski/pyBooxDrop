@@ -1,5 +1,6 @@
 import os
-from typing import TYPE_CHECKING
+from http import HTTPStatus
+from typing import TYPE_CHECKING, NamedTuple
 from unittest import mock
 
 import pytest
@@ -37,3 +38,22 @@ def mocked_client(mocker: MockerFixture) -> mock.Mock:
     client.base_url = None
     client.headers = {}
     return client
+
+
+class ExpectedResponseData(NamedTuple):
+    code: HTTPStatus
+    url: str
+    headers: dict[str, str]
+    content: bytes
+
+
+@pytest.fixture
+def mocked_urlopen(mocker: MockerFixture) -> ExpectedResponseData:
+    data = ExpectedResponseData(HTTPStatus.OK, "https://foo.com/", {"X": "Y"}, b'{"foo": "bar"}')
+    mocked_response = mocker.Mock()
+    mocked_response.status = data.code
+    mocked_response.geturl.return_value = data.url
+    mocked_response.headers = data.headers
+    mocked_response.read.return_value = data.content
+    mocker.patch("boox.client.urlopen").return_value.__enter__.return_value = mocked_response
+    return data

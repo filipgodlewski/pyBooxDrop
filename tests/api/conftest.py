@@ -30,7 +30,7 @@ def email() -> Iterator[EmailProvider]:
     Yields:
         EmailProvider: a testing-only wrapper on httpx.Client.
     """
-    with EmailProvider() as provider:
-        yield provider
-        with suppress(ValueError):
-            provider.cleanup_inbox()
+    provider = EmailProvider()
+    yield provider
+    with suppress(ValueError):
+        provider.cleanup_inbox()

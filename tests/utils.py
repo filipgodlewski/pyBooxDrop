@@ -1,11 +1,11 @@
 import os
 import time
-import warnings
 from collections.abc import Callable
 from functools import wraps
+from importlib.metadata import version
 from typing import ParamSpec, TypeVar
 
-from httpx import Client, HTTPStatusError
+from boox.client import BaseHttpClient, BaseHTTPError
 
 P = ParamSpec("P")
 T = TypeVar("T")
@@ -38,29 +38,18 @@ def with_retry(
 class EmailProvider:
     def __init__(self):
         self.address = os.environ["E2E_SMTP_EMAIL"]
-        x_api_key = os.environ["E2E_SMTP_X_API_KEY"]
-        headers = {"X-API-KEY": x_api_key, "accept": "application/ld+json"}
-        base_url = "https://api.smtp.dev"
-        self.client = Client(base_url=base_url, headers=headers)
+        self.client = BaseHttpClient()
+        self.client.headers.update({
+            "User-Agent": f"python-boox/{version("pybooxdrop")}",
+            "Content-Type": "application/json",
+            "X-API-KEY": os.environ["E2E_SMTP_X_API_KEY"],
+            "accept": "application/ld+json",
+        })
+        self.base_url = "https://api.smtp.dev"
         self.messages_url: str | None = None
         self.newest_message_url: str | None = None
 
-    def __enter__(self):
-        return self
-
-    def __exit__(self, *_):
-        self.close()
-
-    def __del__(self):
-        if not self.client.is_closed:
-            warnings.warn("EmailProvider was not closed explicitly", ResourceWarning, stacklevel=2)
-            self.close()
-
-    def close(self):
-        if not self.client.is_closed:
-            self.client.close()
-
-    @with_retry(retries=5, delay=1, exceptions=(HTTPStatusError, IndexError, KeyError))
+    @with_retry(retries=5, delay=1, exceptions=(BaseHTTPError, IndexError, KeyError))
     def _get_mailbox_url(self) -> str:
         response = self.client.get("accounts")
         data = response.raise_for_status().json()
@@ -70,7 +59,7 @@ class EmailProvider:
         inbox = next(filter(lambda m: m["path"] == "INBOX", mailboxes))
         return inbox["@id"]
 
-    @with_retry(retries=5, delay=1, exceptions=(HTTPStatusError, IndexError, KeyError))
+    @with_retry(retries=5, delay=1, exceptions=(BaseHTTPError, IndexError, KeyError))
     def _get_message_url(self) -> str:
         if not self.messages_url:
             raise ValueError("No INBOX messages url obtained yet")
@@ -81,7 +70,7 @@ class EmailProvider:
         member: dict[str, str] = data["member"][0]
         return f"{self.messages_url}/{member["id"]}"
 
-    @with_retry(retries=10, delay=1, exceptions=(HTTPStatusError, IndexError, KeyError))
+    @with_retry(retries=10, delay=1, exceptions=(BaseHTTPError, IndexError, KeyError))
     def _get_newest_message(self) -> str:
         if not self.newest_message_url:
             raise ValueError("No newest message url obtained yet")

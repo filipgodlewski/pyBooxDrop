@@ -58,8 +58,12 @@ class Boox:
         self.close()
 
     def __del__(self):
-        if not self.is_closed:
-            warnings.warn("Boox client was not closed explicitly", ResourceWarning, stacklevel=2)
+        if not self._is_closed:
+            warnings.warn(
+                "Boox client was not closed explicitly (neither via `with` nor `.close()`)",
+                ResourceWarning,
+                stacklevel=2,
+            )
             self.close()
 
     @property

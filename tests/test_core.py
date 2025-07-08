@@ -1,4 +1,5 @@
 import gc
+import warnings
 from importlib.metadata import version
 from unittest import mock
 
@@ -81,11 +82,40 @@ def test_boox_client_exposed_in_context(mocked_client: mock.Mock):
         assert boox.client is mocked_client
 
 
-def test_boox_warns_if_not_closed(mocked_client: mock.Mock):
-    boox = Boox(client=mocked_client)
-    del boox
-    with pytest.warns(ResourceWarning, match="Boox client was not closed explicitly"):
+def test_warning_when_neither_with_nor_close_used():
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+
+        def create_boox():
+            return Boox()
+
+        boox = create_boox()
+        del boox
         gc.collect()
+
+    assert any(str(w.message).startswith("Boox client was not closed explicitly") for w in w)
+
+
+def test_no_warning_with_context_manager():
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+
+        with Boox():
+            pass
+
+    assert not any(str(w.message).startswith("Boox client was not closed explicitly") for w in w)
+
+
+def test_no_warning_with_manual_close():
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+
+        boox = Boox()
+        boox.close()
+        del boox
+        gc.collect()
+
+    assert not any(str(w.message).startswith("Boox client was not closed explicitly") for w in w)
 
 
 def test_boox_close_calls_internal_method(mocker: MockerFixture, mocked_client: mock.Mock):

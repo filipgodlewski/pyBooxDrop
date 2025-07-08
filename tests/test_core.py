@@ -32,6 +32,20 @@ def test_boox_base_url_inferred_from_client(mocked_client: mock.Mock, url: BooxU
     assert boox.base_url is url
 
 
+def test_explicit_base_url_takes_precedence(mocked_client: mock.Mock):
+    url_taking_precedence = BooxUrl.EUR
+    boox = Boox(client=mocked_client, base_url=url_taking_precedence)
+    assert boox.base_url is url_taking_precedence
+
+
+def test_client_base_url_overrides_constructor_value(mocked_client: mock.Mock):
+    url_taking_precedence = BooxUrl.EUR
+    url_not_taking_precedence = BooxUrl.PUSH
+    mocked_client.base_url = url_taking_precedence
+    boox = Boox(client=mocked_client, base_url=url_not_taking_precedence)
+    assert boox.base_url is url_taking_precedence
+
+
 def test_boox_raises_validation_error_for_invalid_url(mocked_client: mock.Mock):
     mocked_client.base_url = "http://random.url"
     with pytest.raises(ValidationError, match="Input should be", check=shows_all_members):

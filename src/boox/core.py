@@ -39,13 +39,12 @@ class Boox:
         >>> client.close()
     """
 
-    @validate_call(config=ConfigDict(arbitrary_types_allowed=True))
-    def __init__(self, client: HttpClient | None = None) -> None:
+    def __init__(self, client: HttpClient | None = None, base_url: BooxUrl | None = None) -> None:
         if is_closed := getattr(client, "is_closed", False):
             msg = f"Cannot initialize {self.__class__.__name__} with a client which has a closed connection"
             raise ValueError(msg)
 
-        if base_url := getattr(client, "base_url", None):
+        if base_url := (getattr(client, "base_url", None) or base_url):
             base_url = TypeAdapter(BooxUrl).validate_python(base_url)
 
         self._base_url: str | None = base_url

@@ -1,9 +1,10 @@
 # 📖 pyBooxDrop
 
-![CI](https://github.com/filipgodlewski/pyBooxDrop/actions/workflows/ci.yml/badge.svg)
-[![PyPI version](https://img.shields.io/pypi/v/booxdrop.svg)](https://pypi.org/project/booxdrop/)
-[![Python Version](https://img.shields.io/pypi/pyversions/booxdrop.svg)](https://pypi.org/project/booxdrop/)
-[![License](https://img.shields.io/pypi/l/booxdrop.svg)](https://github.com/filipgodlewski/pyBooxDrop/blob/main/LICENSE)
+![GitHub Actions Workflow Status - Unit Tests](https://img.shields.io/github/actions/workflow/status/filipgodlewski/pybooxdrop/ci.yml?style=for-the-badge&label=unit%20tests)
+![GitHub Actions Workflow Status - E2E Tests](https://img.shields.io/github/actions/workflow/status/filipgodlewski/pybooxdrop/e2e.yml?style=for-the-badge&label=E2E%20tests)
+[![PyPI - Minimum Required Python Version](https://img.shields.io/pypi/pyversions/pybooxdrop?style=for-the-badge&label=Min.%20version&labelColor=3776AB&color=FFD43B&logo=python&logoColor=white)](https://pypi.org/project/pybooxdrop/)
+[![PyPI - Version](https://img.shields.io/pypi/v/pybooxdrop?style=for-the-badge&color=3775A9)](https://pypi.org/project/pybooxdrop/)
+[![GitHub License](https://img.shields.io/github/license/filipgodlewski/pybooxdrop?style=for-the-badge&color=3DA639)](https://github.com/filipgodlewski/pyBooxDrop/blob/main/LICENSE)
 
 <div>
 🐍 A friendly Python wrapper for the BOOXDrop API — unofficial, but built with care.

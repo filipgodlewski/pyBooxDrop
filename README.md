@@ -109,6 +109,12 @@ uv sync
 uv run pytest
 ```
 
+Alternatively, use:
+
+```bash
+make test
+```
+
 ### Running E2E tests
 
 Please note that since the E2E tests are heavy, require real internet connection,
@@ -121,6 +127,12 @@ and they connect with the real BOOXDrop server, it is not recommended to run the
 # E2E_TARGET_DOMAIN - the target BOOXDrop domain, e.g. push.boox.com
 uv sync
 uv run pytest -m e2e --e2e
+```
+
+Alternatively, use:
+
+```bash
+make e2e
 ```
 
 - `E2E_SMTP_EMAIL` must lead to an e-mail that is connected to a real Boox account. It must be verified prior to the tests.

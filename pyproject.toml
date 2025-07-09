@@ -88,11 +88,15 @@ ignore = [
   "S101", # Avoid using assert
 ]
 "src/boox/client.py" = [
-  "S310",  # Validate unexpected scheme
+  "S310", # Validate unexpected scheme
 ]
 
 [tool.pytest.ini_options]
 markers = ["e2e: test requiring external API (connects to a real boox server)"]
+filterwarnings = [
+  "error",
+  'ignore:Boox client was not closed explicitly:ResourceWarning',
+]
 
 [tool.basedpyright]
 pythonVersion = "3.12"

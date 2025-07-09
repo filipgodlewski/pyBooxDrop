@@ -2,9 +2,10 @@ import os
 import time
 from collections.abc import Callable
 from functools import wraps
-from importlib.metadata import version
 from typing import ParamSpec, TypeVar
+from urllib.parse import urljoin
 
+from boox.__about__ import __version__
 from boox.client import BaseHttpClient, BaseHTTPError
 
 P = ParamSpec("P")
@@ -40,7 +41,7 @@ class EmailProvider:
         self.address = os.environ["E2E_SMTP_EMAIL"]
         self.client = BaseHttpClient()
         self.client.headers.update({
-            "User-Agent": f"python-boox/{version("pybooxdrop")}",
+            "User-Agent": f"python-boox/{__version__}",
             "X-API-KEY": os.environ["E2E_SMTP_X_API_KEY"],
             "Accept": "application/ld+json",
         })

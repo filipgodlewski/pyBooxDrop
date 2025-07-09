@@ -57,7 +57,10 @@ class BaseHttpClient:
     def _send(request: Request) -> BaseHttpResponse:
         with urlopen(request) as response:
             return BaseHttpResponse(
-                code=response.status, url=response.geturl(), headers=response.headers, content=response.read()
+                code=HTTPStatus(response.status),
+                url=response.geturl(),
+                headers=response.headers,
+                content=response.read(),
             )
 
     @validate_call()
@@ -67,7 +70,7 @@ class BaseHttpClient:
 
     @validate_call()
     def get(self, url: str) -> BaseHttpResponse:
-        request = self._build_request("POST", url, None)
+        request = self._build_request("GET", url, None)
         return self._send(request)
 
     @validate_call()

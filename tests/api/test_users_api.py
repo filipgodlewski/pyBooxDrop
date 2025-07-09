@@ -1,35 +1,62 @@
 import re
+from unittest import mock
 
-import respx
+import pytest
+from pytest_mock import MockerFixture
 
 from boox.api.users import UsersApi
-from boox.client import BooxClient
+from boox.core import Boox
+from boox.models.enums import BooxUrl
 from boox.models.users import SendVerifyCodeRequest, SendVerifyResponse
 from tests.conftest import e2e
 from tests.utils import EmailProvider
 
-
-def test_boox_client_initializes_users_api(client: BooxClient):
-    assert isinstance(client.users, UsersApi)
-    assert client.users._session is client  # pyright: ignore[reportPrivateUsage]
+# pyright: reportPrivateUsage=false
 
 
-@respx.mock(assert_all_called=True, assert_all_mocked=True, base_url="https://eur.boox.com/api/1/")
-def test_send_verification_code(respx_mock: respx.MockRouter, client: BooxClient):
-    response = SendVerifyResponse(data="ok", message="SUCCESS", result_code=0).model_dump()
-    route = respx_mock.post("users/sendVerifyCode").respond(json=response)
+# Move to test_core
+def test_boox_client_initializes_users_api(mocked_client: mock.Mock):
+    boox = Boox(client=mocked_client)
+    assert boox.users._session is boox
+
+
+def test_send_verification_code_calls_post_and_parses_response(mocker: MockerFixture):
+    mocked_session = mocker.Mock()
+    api = UsersApi(session=mocked_session)
+
+    mocked_response = mocker.Mock()
+    mocked_response.json = mocker.Mock(return_value={"data": "ok", "message": "SUCCESS", "result_code": 0})
+
+    api._post = mocker.Mock(return_value=mocked_response)
 
     payload = SendVerifyCodeRequest(mobi="foo@bar.com")
-    result = client.users.send_verification_code(payload=payload)
+    result = api.send_verification_code(payload=payload)
 
-    assert route.called
+    assert result == SendVerifyResponse(data="ok", message="SUCCESS", result_code=0)
+    api._post.assert_called_once_with(endpoint="/users/sendVerifyCode", json={"mobi": "foo@bar.com"})
+
+
+@pytest.mark.parametrize("url", list(BooxUrl))
+def test_users_api_send_verification_code_integration(mocker: MockerFixture, mocked_client: mock.Mock, url: BooxUrl):
+    mocked_response = mocker.Mock()
+    mocked_response.json.return_value = {"data": "ok", "message": "SUCCESS", "result_code": 0}
+    mocked_response.raise_for_status.return_value = mocked_response
+    mocked_client.post.return_value = mocked_response
+
+    with Boox(client=mocked_client, base_url=url) as boox:
+        payload = SendVerifyCodeRequest(mobi="foo@bar.com")
+        result = boox.users.send_verification_code(payload=payload)
+
+    expected_url = url.value + "users/sendVerifyCode"
+    expected_json = payload.model_dump(exclude_unset=True)
+    mocked_client.post.assert_called_once_with(expected_url, json=expected_json)
+    mocked_response.json.assert_called_once()
     assert isinstance(result, SendVerifyResponse)
     assert result.data == "ok"
-    assert str(result) == "<0: SUCCESS>"
 
 
 @e2e
-def test_send_verification_code_e2e(client: BooxClient, email: EmailProvider):
+def test_send_verification_code_e2e(client: Boox, email: EmailProvider):
     payload = SendVerifyCodeRequest(mobi=email.address)
 
     response = client.users.send_verification_code(payload=payload)

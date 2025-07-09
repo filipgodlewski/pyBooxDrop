@@ -8,9 +8,10 @@ on:
 jobs:
   qa:
     name: Check code and test
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
         python-version: [3.12, 3.13]
 
     steps:

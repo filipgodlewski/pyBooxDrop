@@ -1,72 +1,82 @@
-import re
-import warnings
+import json as jsonlib
+from http import HTTPStatus
+from typing import Any, Self
+from urllib.request import Request, urlopen
 
-import httpx
-from pydantic import SecretStr, validate_call
-
-from boox.api.users import UsersApi
-from boox.models.base import BooxApiUrl
+from pydantic import validate_call
 
 
-class BooxClient:
-    """The client used to communicate with the BOOXDrop remote server.
+class BaseHTTPError(Exception):
+    """Base HTTP exception."""
 
-    It is not meant to be used with the local connection (via USB protocol) as it has a completely different API.
+    def __init__(self, url: str, code: HTTPStatus, headers: dict[str, str], content: bytes) -> None:
+        self.url = url
+        self.code = code
+        self.headers = headers
+        self._content = content
 
-    Note that this class is in fact a context manager. It is highly recommended to use it as such.
-    If you prefer to not use it as a context manager, please remember to **close the connection** manually.
-
-    Examples:
-        Example 1, using as a context manager. Note that you must initialize the BooxClient class every time
-        you start a context manager. This is due to the fact, that it relies on httpx library.
-        httpx library, upon leaving the context manager, terminates the connection.
-
-        >>> # Given it is the very first connection, and no token is available:
-        >>> with BooxClient(url="eur.boox.com") as client:
-        ...     payload = {"mobi": "foo@bar.com"}
-        ...     client.users.send_verification_code(payload=payload)
-        SendVerifyResponse(<0: SUCCESS>)
-
-        Example 2, closing the connection manually. It is not recommended, but it's not my job to stop you from that.
-
-        >>> client = BooxClient(url="eur.boox.com")
-        >>> payload = {"mobi": "foo@bar.com"}
-        >>> client.users.send_verification_code(payload=payload)
-        SendVerifyResponse(<0: SUCCESS>)
-        >>> client.close()
-    """
-
-    @validate_call()
-    def __init__(self, *, url: BooxApiUrl, token: SecretStr | None = None) -> None:
-        self.client = httpx.Client(base_url=str(url))
-        self.token: SecretStr = token or SecretStr("")
-        self.users = UsersApi(self)
+    @property
+    def content(self) -> str:
+        return self._content.decode()
 
     def __str__(self) -> str:
-        return f"{self.__class__.__name__} on {self.client.base_url!s}"
+        return f"HTTP Error {self.code.value}: {self.code.phrase}"
 
     def __repr__(self) -> str:
-        host = self.client.base_url.host
-        path = self.client.base_url.path
-        match = re.compile(r"\d+").search(path)
-        if not match:
-            raise ValueError("No api version found in the base url!")
+        return f"<HTTP Error {self.code.value}: {self.code.phrase!r}>"
 
-        api_version = match.group()
-        has_token = bool(self.token)
-        return f"{self.__class__.__name__}({host=}, {api_version=}, {has_token=})"
 
-    def __enter__(self):
-        return self
+class BaseHttpResponse:
+    def __init__(self, *, code: HTTPStatus, url: str, headers: dict[str, str], content: bytes) -> None:
+        self._code = code
+        self._url = url
+        self._headers = headers
+        self._content = content
 
-    def __exit__(self, *_):
-        self.close()
+    def __repr__(self) -> str:
+        return f"<Response [{self._code.value}]>"
 
-    def __del__(self):
-        if not self.client.is_closed:
-            warnings.warn("BooxClient was not closed explicitly", ResourceWarning, stacklevel=2)
-            self.close()
+    def raise_for_status(self) -> Self:
+        if self._code.is_success:
+            return self
+        raise BaseHTTPError(url=self._url, code=self._code, headers=self._headers, content=self._content)
 
-    def close(self):
-        if not self.client.is_closed:
-            self.client.close()
+    def json(self, **kwargs: Any) -> Any:
+        return jsonlib.loads(self._content, **kwargs)
+
+
+class BaseHttpClient:
+    def __init__(self) -> None:
+        self.headers: dict[str, str] = {}
+
+    def _build_request(self, method: str, url: str, json: Any | None) -> Request:
+        data = jsonlib.dumps(json).encode() if json else None
+        return Request(url=url, data=data, headers=self.headers, method=method)
+
+    @staticmethod
+    def _send(request: Request) -> BaseHttpResponse:
+        with urlopen(request) as response:
+            return BaseHttpResponse(
+                code=HTTPStatus(response.status),
+                url=response.geturl(),
+                headers=response.headers,
+                content=response.read(),
+            )
+
+    @validate_call()
+    def post(self, url: str, json: Any | None = None) -> BaseHttpResponse:
+        request = self._build_request("POST", url, json)
+        return self._send(request)
+
+    @validate_call()
+    def get(self, url: str) -> BaseHttpResponse:
+        request = self._build_request("GET", url, None)
+        return self._send(request)
+
+    @validate_call()
+    def delete(self, url: str) -> BaseHttpResponse:
+        request = self._build_request("DELETE", url, None)
+        return self._send(request)
+
+    def close(self) -> None:
+        pass

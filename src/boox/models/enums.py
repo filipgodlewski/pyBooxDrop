@@ -1,6 +1,6 @@
 from enum import StrEnum
 
 
-class BooxDomain(StrEnum):
-    EUR = "eur.boox.com"
-    PUSH = "push.boox.com"
+class BooxUrl(StrEnum):
+    EUR = "https://eur.boox.com/api/1/"
+    PUSH = "https://push.boox.com/api/1/"

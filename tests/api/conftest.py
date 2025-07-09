@@ -3,27 +3,21 @@ from collections.abc import Iterator
 from contextlib import suppress
 
 import pytest
-from _pytest.fixtures import SubRequest
 
-from boox.client import BooxClient
-from boox.models.base import BooxApiUrl
-from boox.models.enums import BooxDomain
+from boox.core import Boox
+from boox.models.enums import BooxUrl
 from tests.utils import EmailProvider
 
 
-@pytest.fixture(scope="session")
-def client(request: SubRequest) -> Iterator[BooxClient]:
-    """A client used for mocked and E2E tests.
-
-    Used as a context manager to utilize the keep-alive functionality.
+@pytest.fixture
+def client() -> Iterator[Boox]:
+    """A simple client used for E2E tests.
 
     Yields:
-        Iterator[BooxClient]: A client that can be used for api testing.
+        Iterator[Boox]: A client that can be used for api testing.
     """
-
-    domain = os.environ["E2E_TARGET_DOMAIN"] if request.config.getoption("--e2e") else BooxDomain.EUR
-    with BooxClient(url=BooxApiUrl(BooxDomain(domain))) as client:
-        yield client
+    with Boox(base_url=BooxUrl(os.environ["E2E_TARGET_DOMAIN"])) as boox:
+        yield boox
 
 
 @pytest.fixture(scope="session")
@@ -36,7 +30,7 @@ def email() -> Iterator[EmailProvider]:
     Yields:
         EmailProvider: a testing-only wrapper on httpx.Client.
     """
-    with EmailProvider() as provider:
-        yield provider
-        with suppress(ValueError):
-            provider.cleanup_inbox()
+    provider = EmailProvider()
+    yield provider
+    with suppress(ValueError):
+        provider.cleanup_inbox()

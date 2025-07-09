@@ -1,6 +1,6 @@
 [project]
 name = "pybooxdrop"
-version = "0.1.2"
+version = "0.1.3"
 description = "A friendly Python wrapper for the BOOXDrop API — unofficial, but built with care."
 authors = [
   { name = "Filip Godlewski", email = "54432731+filipgodlewski@users.noreply.github.com" },
@@ -14,10 +14,15 @@ classifiers = [
   "Operating System :: OS Independent",
 ]
 requires-python = ">=3.12"
-dependencies = ["httpx>=0.28.1", "pydantic[email]>=2.11.5"]
+dependencies = ["pydantic[email]>=2.11.5"]
 
 [dependency-groups]
-dev = ["basedpyright>=1.29.4", "pytest>=8.3.5", "respx>=0.22.0", "ruff>=0.12.0"]
+dev = [
+  "basedpyright>=1.29.4",
+  "pytest==8.4.1",
+  "pytest-mock>=3.14.1",
+  "ruff>=0.12.0",
+]
 
 # In the future, consider using uv_build backend once it's stable
 [build-system]
@@ -77,13 +82,20 @@ ignore = [
   "EM101",  # Exception must not use a string literal, assign to variable first
 ]
 
-[tool.ruff.per-file-ignores]
+[tool.ruff.lint.per-file-ignores]
 "tests/*" = [
   "S101", # Avoid using assert
+]
+"src/boox/client.py" = [
+  "S310", # Validate unexpected scheme
 ]
 
 [tool.pytest.ini_options]
 markers = ["e2e: test requiring external API (connects to a real boox server)"]
+filterwarnings = [
+  "error",
+  'ignore:Boox client was not closed explicitly:ResourceWarning',
+]
 
 [tool.basedpyright]
 pythonVersion = "3.12"

@@ -15,13 +15,13 @@ def meta() -> dict[str, Any]:
     return data["project"]
 
 
-def test_a(meta: dict[str, Any]):
+def test_version_matches_about_metadata(meta: dict[str, Any]):
     assert meta["version"] == __about__.__version__, "versions are out of sync"
 
 
-def test_b(meta: dict[str, Any]):
+def test_name_matches_about_metadata(meta: dict[str, Any]):
     assert meta["name"] == __about__.__title__, "package name is out of sync"
 
 
-def test_c(meta: dict[str, Any]):
+def test_description_matches_about_metadata(meta: dict[str, Any]):
     assert meta["description"] == __about__.__description__, "package description is out of sync"

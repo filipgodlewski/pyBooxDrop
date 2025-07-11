@@ -2,19 +2,37 @@
 name = "pybooxdrop"
 version = "0.1.3"
 description = "A friendly Python wrapper for the BOOXDrop API — unofficial, but built with care."
-authors = [
-  { name = "Filip Godlewski", email = "54432731+filipgodlewski@users.noreply.github.com" },
-]
 readme = "README.md"
-license = { text = "MIT" }
-keywords = ["boox", "onyx", "ebook", "api", "reader"]
+license = "MIT"
+keywords = [
+  "boox",
+  "booxdrop",
+  "onyx",
+  "ebook-reader",
+  "api-wrapper",
+  "python-wrapper",
+  "file-transfer",
+]
 classifiers = [
+  "Intended Audience :: Developers",
   "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: System :: Networking",
+  "Topic :: Utilities",
 ]
 requires-python = ">=3.12"
 dependencies = ["pydantic[email]>=2.11.5"]
+
+[[project.authors]]
+name = "Filip Godlewski"
+email = "54432731+filipgodlewski@users.noreply.github.com"
+
+[project.urls]
+Source = "https://github.com/filipgodlewski/pybooxdrop"
+Issues = "https://github.com/filipgodlewski/pybooxdrop/issues"
 
 [dependency-groups]
 dev = [

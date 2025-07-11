@@ -38,6 +38,7 @@ Issues = "https://github.com/filipgodlewski/pybooxdrop/issues"
 dev = [
   "basedpyright>=1.29.4",
   "pytest==8.4.1",
+  "pytest-cov>=6.2.1",
   "pytest-mock>=3.14.1",
   "ruff>=0.12.0",
 ]
@@ -113,6 +114,27 @@ markers = ["e2e: test requiring external API (connects to a real boox server)"]
 filterwarnings = [
   "error",
   'ignore:Boox client was not closed explicitly:ResourceWarning',
+]
+addopts = ["--cov", "src/boox", "--strict-markers"]
+
+[tool.coverage.run]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+skip_empty = true
+fail_under = 100
+exclude_also = [
+  '^\s*raise AssertionError\b',
+  '^\s*raise NotImplementedError\b',
+  '^\s*return NotImplemented\b',
+  '^\s*raise$',                               # reraising an error
+  '^\s*if (False|(typing\.)?TYPE_CHECKING):',
+  ': \.\.\.(\s*#.*)?$',                       # no implementation (e.g. Protocol)
+  '^ +\.\.\.$',                               # no implementation, but a newline
+  "-> ['\"]?NoReturn['\"]?:",
+
 ]
 
 [tool.basedpyright]

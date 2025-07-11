@@ -118,4 +118,3 @@ filterwarnings = [
 [tool.basedpyright]
 pythonVersion = "3.12"
 typeCheckingMode = "strict"
-allowedUntypedLibraries = ["respx"]

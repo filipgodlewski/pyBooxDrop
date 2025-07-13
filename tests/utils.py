@@ -2,17 +2,13 @@ import os
 import time
 from collections.abc import Callable
 from functools import wraps
-from typing import ParamSpec, TypeVar
 from urllib.parse import urljoin
 
 from boox.__about__ import __version__
 from boox.client import BaseHttpClient, BaseHTTPError
 
-P = ParamSpec("P")
-T = TypeVar("T")
 
-
-def with_retry(
+def with_retry[**P, T](
     *, retries: int, delay: int, exceptions: tuple[type[BaseException], ...]
 ) -> Callable[[Callable[P, T]], Callable[P, T]]:
     def decorator(func: Callable[P, T]) -> Callable[P, T]:

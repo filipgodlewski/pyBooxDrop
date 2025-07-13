@@ -8,6 +8,8 @@ from pytest_mock import MockerFixture
 from boox.client import BaseHttpClient, BaseHTTPError, BaseHttpResponse
 from tests.conftest import ExpectedResponseData
 
+# pyright: reportPrivateUsage=false
+
 SUCCESSES = (HTTPStatus.OK, HTTPStatus.CREATED, HTTPStatus.NO_CONTENT)
 FAILURES = (HTTPStatus.BAD_REQUEST, HTTPStatus.NOT_FOUND, HTTPStatus.INTERNAL_SERVER_ERROR)
 
@@ -104,9 +106,6 @@ def test_delete_populates_response_fields_correctly(mocker: MockerFixture, mocke
 
     spy.assert_called_once_with("DELETE", mocked_urlopen.url, None)
     assert_response(response, mocked_urlopen)
-
-
-# pyright: reportPrivateUsage=false
 
 
 @pytest.mark.parametrize("code", SUCCESSES)

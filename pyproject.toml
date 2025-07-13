@@ -37,8 +37,8 @@ Issues = "https://github.com/filipgodlewski/pybooxdrop/issues"
 [dependency-groups]
 dev = [
   "basedpyright>=1.29.4",
+  "coverage>=7.9.2",
   "pytest==8.4.1",
-  "pytest-cov>=6.2.1",
   "pytest-mock>=3.14.1",
   "ruff>=0.12.0",
 ]
@@ -115,10 +115,11 @@ filterwarnings = [
   "error",
   'ignore:Boox client was not closed explicitly:ResourceWarning',
 ]
-addopts = ["--cov", "src/boox", "--strict-markers"]
+addopts = ["--strict-markers"]
 
 [tool.coverage.run]
 branch = true
+source = ["."]
 
 [tool.coverage.report]
 show_missing = true
@@ -134,7 +135,6 @@ exclude_also = [
   ': \.\.\.(\s*#.*)?$',                       # no implementation (e.g. Protocol)
   '^ +\.\.\.$',                               # no implementation, but a newline
   "-> ['\"]?NoReturn['\"]?:",
-
 ]
 
 [tool.basedpyright]

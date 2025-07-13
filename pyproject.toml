@@ -119,7 +119,7 @@ addopts = ["--strict-markers"]
 
 [tool.coverage.run]
 branch = true
-source = ["."]
+source = ["boox"]
 
 [tool.coverage.report]
 show_missing = true

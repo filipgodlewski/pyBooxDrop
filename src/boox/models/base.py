@@ -20,4 +20,4 @@ class BaseResponse[T](BaseModel, ABC):
         return f"<{self.result_code}: {self.message}>"
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self!s})"
+        return f"{type(self).__name__}({self!s})"

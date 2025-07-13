@@ -18,7 +18,7 @@ class Api:
 
     def _prepare_url(self, endpoint: str) -> str:
         if self._session.base_url is None:
-            msg = f"{self._session.__class__.__name__}.base_url must be filled"
+            msg = f"{type(self._session).__name__}.base_url must be filled"
             raise ValueError(msg)
         return urljoin(self._session.base_url, endpoint.lstrip("/"))
 

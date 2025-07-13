@@ -86,6 +86,7 @@ class Boox:
 
     def close(self):
         """An explicit way of closing the Boox client."""
-        if not self.is_closed and getattr(self, "client", None) is not None:
-            self.client.close()
-            self._is_closed = True
+        if self.is_closed or getattr(self, "client", None) is None:
+            return
+        self.client.close()
+        self._is_closed = True

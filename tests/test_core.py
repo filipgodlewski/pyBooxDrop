@@ -11,6 +11,8 @@ from boox.api.users import UsersApi
 from boox.core import Boox
 from boox.models.enums import BooxUrl
 
+# pyright: reportPrivateUsage=false
+
 
 def shows_all_members(e: ValidationError) -> bool:
     errors = e.errors(include_url=False, include_context=False, include_input=False)
@@ -131,6 +133,34 @@ def test_boox_raises_on_closed_client(mocked_client: mock.Mock):
 
     with pytest.raises(ValueError, match="Cannot initialize Boox with a closed connection"):
         Boox(client=mocked_client)
+
+
+def test_close_calls_client_and_sets_flag(mocker: MockerFixture, mocked_client: mock.Mock):
+    boox = Boox(client=mocked_client)
+    spy = mocker.spy(mocked_client, "close")
+
+    boox.close()
+    spy.assert_called_once()
+    assert boox._is_closed
+
+
+def test_close_skips_if_already_closed(mocker: MockerFixture, mocked_client: mock.Mock):
+    boox = Boox(client=mocked_client)
+    spy = mocker.spy(mocked_client, "close")
+    boox._is_closed = True
+
+    boox.close()
+    spy.assert_not_called()
+
+
+def test_close_skips_if_client_missing(mocker: MockerFixture, mocked_client: mock.Mock):
+    boox = Boox(client=mocked_client)
+    spy = mocker.spy(mocked_client, "close")
+    del boox.client
+
+    boox.close()
+    spy.assert_not_called()
+    assert not boox._is_closed
 
 
 def test_boox_client_is_assigned_properly(mocked_client: mock.Mock):

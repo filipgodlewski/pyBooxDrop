@@ -14,7 +14,6 @@ from tests.utils import EmailProvider
 # pyright: reportPrivateUsage=false
 
 
-# Move to test_core
 def test_boox_client_initializes_users_api(mocked_client: mock.Mock):
     boox = Boox(client=mocked_client)
     assert boox.users._session is boox
@@ -56,10 +55,12 @@ def test_users_api_send_verification_code_integration(mocker: MockerFixture, moc
 
 
 @e2e
-def test_send_verification_code_e2e(client: Boox, email: EmailProvider):
+def test_send_verification_code_e2e(e2e_domain: str, email: EmailProvider):
     payload = SendVerifyCodeRequest(mobi=email.address)
 
-    response = client.users.send_verification_code(payload=payload)
+    with Boox(base_url=BooxUrl(e2e_domain)) as boox:
+        response = boox.users.send_verification_code(payload=payload)
+
     assert response.data == "ok"
     message = email.get_newest_message()
     match = re.compile(r"^The code is (\d{6}) for account verification from BOOX.").match(message)

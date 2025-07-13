@@ -1,9 +1,7 @@
-from abc import ABC
-
 from pydantic import BaseModel
 
 
-class BaseResponse[T](BaseModel, ABC):
+class BaseResponse[T](BaseModel):
     """General server response.
 
     Attributes:

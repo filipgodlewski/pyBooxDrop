@@ -4,7 +4,7 @@ from collections.abc import Callable
 from functools import wraps
 from urllib.parse import urljoin
 
-from boox.__about__ import __version__
+from boox import __version__
 from boox.client import BaseHttpClient, BaseHTTPError
 
 

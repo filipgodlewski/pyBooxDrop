@@ -6,7 +6,7 @@ import pytest
 from pydantic import ValidationError
 from pytest_mock import MockerFixture
 
-from boox.__about__ import __version__
+from boox import __version__
 from boox.api.users import UsersApi
 from boox.core import Boox
 from boox.models.enums import BooxUrl

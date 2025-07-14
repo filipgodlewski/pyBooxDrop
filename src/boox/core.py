@@ -2,7 +2,7 @@ import warnings
 
 from pydantic import ConfigDict, TypeAdapter, validate_call
 
-from boox.__about__ import __version__
+from boox import __version__
 from boox.api.users import UsersApi
 from boox.client import BaseHttpClient
 from boox.models.enums import BooxUrl

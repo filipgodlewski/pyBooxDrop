@@ -2,8 +2,8 @@ name: release
 
 on:
   push:
-    branches:
-      - main
+    tags:
+      - "v*.*.*"
 
 jobs:
   pypi:
@@ -13,6 +13,23 @@ jobs:
       name: release
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: Read version from local file
+        id: version
+        run: |
+          VERSION=$(grep '__version__' src/boox/__init__.py | cut -d'"' -f2)
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Compare local version to pushed tag
+        run: |
+          VERSION="${{ steps.version.outputs.version }}
+          TAG=${GITHUB_REF#refs/tags/v}
+          if [[ "$TAG" != "$VERSION" ]]; then
+            echo "Tag version ($TAG) does not match local file's version ($VERSION)"
+            exit 1
+          fi
 
       - name: Install uv and set the python version
         uses: astral-sh/setup-uv@v6
@@ -21,10 +38,6 @@ jobs:
 
       - name: Install build dependencies
         run: uv sync
-
-        # TODO: Grab the PR title
-        # TODO: Bump version in __version__ (must resolve it)
-        # TODO: Create new git tag
 
       - name: Build package
         run: uv build

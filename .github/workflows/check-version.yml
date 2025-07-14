@@ -1,0 +1,25 @@
+name: Check version bump if feat or fix
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-version:
+    if: startsWith(github.event.pull_request.title, 'feat') || startsWith(github.event.pull_request.title, 'fix')
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Ensure version was bumped
+        run: |
+          if git diff origin/main...HEAD -- src/boox/__init__.py | grep '__version__ ='; then
+            echo "✅ Version bump detected, just make sure it's a good one 😇"
+          else
+            echo "❌ Version bump required for 'feat' or 'fix' PR"
+            exit 1
+          fi

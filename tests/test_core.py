@@ -6,7 +6,6 @@ import pytest
 from pydantic import ValidationError
 from pytest_mock import MockerFixture
 
-from boox import __version__
 from boox.api.users import UsersApi
 from boox.core import Boox
 from boox.models.enums import BooxUrl
@@ -175,7 +174,4 @@ def test_boox_users_api_is_initialized(mocked_client: mock.Mock):
 
 def test_boox_sets_default_headers(mocked_client: mock.Mock):
     boox = Boox(client=mocked_client)
-    assert boox.client.headers == {
-        "User-Agent": f"python-boox/{__version__}",
-        "Content-Type": "application/json",
-    }
+    assert boox.client.headers == {"Content-Type": "application/json"}

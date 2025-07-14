@@ -4,7 +4,6 @@ from collections.abc import Callable
 from functools import wraps
 from urllib.parse import urljoin
 
-from boox import __version__
 from boox.client import BaseHttpClient, BaseHTTPError
 
 
@@ -37,7 +36,6 @@ class EmailProvider:
         self.address = os.environ["E2E_SMTP_EMAIL"]
         self.client = BaseHttpClient()
         self.client.headers.update({
-            "User-Agent": f"python-boox/{__version__}",
             "X-API-KEY": os.environ["E2E_SMTP_X_API_KEY"],
             "Accept": "application/ld+json",
         })

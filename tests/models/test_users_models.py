@@ -1,7 +1,7 @@
 import pytest
 from pydantic import ValidationError
 
-from boox.models.users import SendVerifyCodeRequest, soft_validate_email
+from boox.models.users import FetchTokenRequest, SendVerifyCodeRequest, soft_validate_email
 
 EMAIL = "foo@bar.com"
 INVALID_EMAIL = "foobar@baz"
@@ -27,6 +27,11 @@ def test_validation_requires_area_code_for_phone_number():
         SendVerifyCodeRequest.model_validate({"mobi": "123456789"})
 
 
+def test_validation_fails_when_area_code_does_not_match_pattern():
+    with pytest.raises(ValidationError, match="String should match pattern"):
+        SendVerifyCodeRequest.model_validate({"mobi": "123456789", "area_code": "0048"})
+
+
 def test_validation_fails_when_mobi_is_neither_email_nor_phone():
     with pytest.raises(ValidationError, match="mobi field must either be an e-mail or a phone number"):
         SendVerifyCodeRequest.model_validate({"mobi": INVALID_EMAIL})
@@ -38,5 +43,13 @@ def test_validation_fails_when_email_and_area_code_are_both_provided():
 
 
 def test_validation_allows_email_without_area_code():
-    data = {"mobi": EMAIL}
-    assert SendVerifyCodeRequest.model_validate(data)
+    assert SendVerifyCodeRequest.model_validate({"mobi": EMAIL})
+
+
+def test_validation_fails_when_verification_code_does_not_match_pattern():
+    with pytest.raises(ValidationError, match="String should match pattern"):
+        FetchTokenRequest.model_validate({"mobi": EMAIL, "code": "1234567"})
+
+
+def test_validation_succeeds_when_verification_code_matches_pattern():
+    assert FetchTokenRequest.model_validate({"mobi": EMAIL, "code": "123456"})

@@ -8,8 +8,8 @@ from boox.api.users import UsersApi
 from boox.core import Boox
 from boox.models.enums import BooxUrl
 from boox.models.users import SendVerifyCodeRequest, SendVerifyResponse
+from tests.api.utils import EmailProvider
 from tests.conftest import e2e
-from tests.utils import EmailProvider
 
 # pyright: reportPrivateUsage=false
 

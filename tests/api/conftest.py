@@ -4,7 +4,7 @@ from contextlib import suppress
 
 import pytest
 
-from tests.utils import EmailProvider
+from tests.api.utils import EmailProvider
 
 
 @pytest.fixture(scope="session")

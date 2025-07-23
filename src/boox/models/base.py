@@ -1,9 +1,7 @@
-from abc import ABC
-
 from pydantic import BaseModel
 
 
-class BaseResponse[T](BaseModel, ABC):
+class BaseResponse[T](BaseModel):
     """General server response.
 
     Attributes:
@@ -12,7 +10,7 @@ class BaseResponse[T](BaseModel, ABC):
         result_code (int): Internal result code.
     """
 
-    data: T | None
+    data: T
     message: str
     result_code: int
 
@@ -20,4 +18,4 @@ class BaseResponse[T](BaseModel, ABC):
         return f"<{self.result_code}: {self.message}>"
 
     def __repr__(self) -> str:
-        return f"{self.__class__.__name__}({self!s})"
+        return f"{type(self).__name__}({self!s})"

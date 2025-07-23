@@ -28,7 +28,8 @@ or plug it into your own tools and scripts.
   <summary>Supported endpoints</summary>
 
 ```http
-POST /users/sendVerifyCode
+POST /api/1/users/sendVerifyCode
+POST /api/1/users/signupByPhoneOrEmail
 ```
 
 </details>
@@ -49,13 +50,13 @@ pip install pybooxdrop
 from boox import Boox
 
 # Given it is the very first connection, and no token is available:
-with Boox(base_url="eur.boox.com") as client:
+with Boox(base_url="https://eur.boox.com") as client:
     payload = {"mobi": "foo@bar.com"}
     _ = client.users.send_verification_code(payload=payload)
 
 # OR, if you don't want to use the context manager
 
-client = Boox(base_url="eur.boox.com")
+client = Boox(base_url="https://eur.boox.com")
 payload = {"mobi": "foo@bar.com"}
 _ = client.users.send_verification_code(payload=payload)
 client.close()

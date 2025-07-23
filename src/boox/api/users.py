@@ -1,7 +1,7 @@
 from pydantic import validate_call
 
 from boox.api.core import Api
-from boox.models.users import SendVerifyCodeRequest, SendVerifyResponse
+from boox.models.users import FetchTokenRequest, FetchTokenResponse, SendVerifyCodeRequest, SendVerifyResponse
 
 
 class UsersApi(Api):
@@ -21,9 +21,8 @@ class UsersApi(Api):
         The verification code is valid for 5 minutes.
         The official BOOXDrop service has a 1 minute countdown before you can resend the code (for a particular method).
 
-        Since this method is used **before** authentication, it has to be a staticmethod.
-        Luckily, it is not necessary to use it every single time, because the tokens received after verification
-        are expiring every 20 days.
+        This method is used **before** authentication. Luckily, it is not necessary to use it every single time,
+        because the tokens received after verification expire every 20 days.
 
         Args:
             payload (SendVerifyCodeRequest): The validated payload to be sent in order to receive the verification code.
@@ -31,5 +30,23 @@ class UsersApi(Api):
         Returns:
             SendVerifyResponse: The validated, generic response that is always received from the server.
         """
-        response = self._post(endpoint="/users/sendVerifyCode", json=payload.model_dump(exclude_unset=True))
+        response = self._post(endpoint="/api/1/users/sendVerifyCode", json=payload.model_dump(exclude_unset=True))
         return SendVerifyResponse.model_validate(response.json())
+
+    @validate_call()
+    def fetch_session_token(self, *, payload: FetchTokenRequest) -> FetchTokenResponse:
+        """A call to sign in using the obtained verification code.
+
+        Once a verification code is received, it can be used for this request in a payload, along the verification method used in
+        send_verification_code method above.
+
+        This method is the vertification. It allows you to receive the session token used in many other requests of all types.
+
+        Args:
+            payload (FetchTokenRequest): The validated payload to be sent in order to fetch the session token.
+
+        Returns:
+            FetchTokenResponse: The validated response containing a session token.
+        """
+        response = self._post(endpoint="/api/1/users/signupByPhoneOrEmail", json=payload.model_dump(exclude_unset=True))
+        return FetchTokenResponse.model_validate(response.json())

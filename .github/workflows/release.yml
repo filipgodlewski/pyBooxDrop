@@ -4,10 +4,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  release:
+  pypi:
     name: PyPI Release
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch'
+    environment:
+      name: release
     steps:
       - uses: actions/checkout@v4
 
@@ -23,6 +24,4 @@ jobs:
         run: uv build
 
       - name: Publish to PyPI
-        env:
-          UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
-        run: uv publish
+        run: uv publish --trusted-publishing always

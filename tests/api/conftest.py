@@ -1,27 +1,18 @@
-import os
 from collections.abc import Iterator
 from contextlib import suppress
 
 import pytest
 
-from boox.core import Boox
-from boox.models.enums import BooxUrl
-from tests.utils import EmailProvider
-
-
-@pytest.fixture
-def client() -> Iterator[Boox]:
-    """A simple client used for E2E tests.
-
-    Yields:
-        Iterator[Boox]: A client that can be used for api testing.
-    """
-    with Boox(base_url=BooxUrl(os.environ["E2E_TARGET_DOMAIN"])) as boox:
-        yield boox
+from tests.api.utils import E2EConfig, EmailProvider
 
 
 @pytest.fixture(scope="session")
-def email() -> Iterator[EmailProvider]:
+def config() -> E2EConfig:
+    return E2EConfig()
+
+
+@pytest.fixture(scope="session")
+def email(config: E2EConfig) -> Iterator[EmailProvider]:
     """An email provider for connecting to an SMTP server.
 
     Useful for getting the verification code.
@@ -30,7 +21,7 @@ def email() -> Iterator[EmailProvider]:
     Yields:
         EmailProvider: a testing-only wrapper on httpx.Client.
     """
-    provider = EmailProvider()
+    provider = EmailProvider(config)
     yield provider
     with suppress(ValueError):
         provider.cleanup_inbox()

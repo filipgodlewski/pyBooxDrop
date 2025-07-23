@@ -6,10 +6,11 @@ import pytest
 from pydantic import ValidationError
 from pytest_mock import MockerFixture
 
-from boox.__about__ import __version__
 from boox.api.users import UsersApi
 from boox.core import Boox
 from boox.models.enums import BooxUrl
+
+# pyright: reportPrivateUsage=false
 
 
 def shows_all_members(e: ValidationError) -> bool:
@@ -133,6 +134,34 @@ def test_boox_raises_on_closed_client(mocked_client: mock.Mock):
         Boox(client=mocked_client)
 
 
+def test_close_calls_client_and_sets_flag(mocker: MockerFixture, mocked_client: mock.Mock):
+    boox = Boox(client=mocked_client)
+    spy = mocker.spy(mocked_client, "close")
+
+    boox.close()
+    spy.assert_called_once()
+    assert boox._is_closed
+
+
+def test_close_skips_if_already_closed(mocker: MockerFixture, mocked_client: mock.Mock):
+    boox = Boox(client=mocked_client)
+    spy = mocker.spy(mocked_client, "close")
+    boox._is_closed = True
+
+    boox.close()
+    spy.assert_not_called()
+
+
+def test_close_skips_if_client_missing(mocker: MockerFixture, mocked_client: mock.Mock):
+    boox = Boox(client=mocked_client)
+    spy = mocker.spy(mocked_client, "close")
+    del boox.client
+
+    boox.close()
+    spy.assert_not_called()
+    assert not boox._is_closed
+
+
 def test_boox_client_is_assigned_properly(mocked_client: mock.Mock):
     boox = Boox(client=mocked_client)
     assert boox.client is mocked_client
@@ -145,7 +174,4 @@ def test_boox_users_api_is_initialized(mocked_client: mock.Mock):
 
 def test_boox_sets_default_headers(mocked_client: mock.Mock):
     boox = Boox(client=mocked_client)
-    assert boox.client.headers == {
-        "User-Agent": f"python-boox/{__version__}",
-        "Content-Type": "application/json",
-    }
+    assert boox.client.headers == {"Content-Type": "application/json"}

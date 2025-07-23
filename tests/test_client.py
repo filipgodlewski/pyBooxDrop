@@ -1,12 +1,16 @@
 import json
 from http import HTTPStatus
+from http.client import HTTPMessage
 from json import JSONDecodeError
+from urllib.error import HTTPError
 
 import pytest
 from pytest_mock import MockerFixture
 
 from boox.client import BaseHttpClient, BaseHTTPError, BaseHttpResponse
 from tests.conftest import ExpectedResponseData
+
+# pyright: reportPrivateUsage=false
 
 SUCCESSES = (HTTPStatus.OK, HTTPStatus.CREATED, HTTPStatus.NO_CONTENT)
 FAILURES = (HTTPStatus.BAD_REQUEST, HTTPStatus.NOT_FOUND, HTTPStatus.INTERNAL_SERVER_ERROR)
@@ -72,6 +76,22 @@ def test_build_request_with_json_payload():
     assert request.get_method() == "POST"
 
 
+def test_request_error_is_caught_and_can_be_raised_for_status(mocker: MockerFixture):
+    client = BaseHttpClient()
+    headers = HTTPMessage()
+    headers.add_header("X", "Y")
+    http_error = HTTPError(code=500, url="https://foo.com", msg="Internal Server Error", hdrs=headers, fp=None)
+
+    mocker.patch("boox.client.urlopen").side_effect = http_error
+    response = client._send(request=mocker.Mock())
+    with pytest.raises(BaseHTTPError) as e:
+        response.raise_for_status()
+
+    assert e.value.url == "https://foo.com"
+    assert e.value.code is HTTPStatus.INTERNAL_SERVER_ERROR
+    assert e.value.headers == {"X": "Y"}
+
+
 def test_send_populates_response_fields_correctly(mocker: MockerFixture, mocked_urlopen: ExpectedResponseData):
     client = BaseHttpClient()
     response = client._send(request=mocker.Mock())
@@ -104,9 +124,6 @@ def test_delete_populates_response_fields_correctly(mocker: MockerFixture, mocke
 
     spy.assert_called_once_with("DELETE", mocked_urlopen.url, None)
     assert_response(response, mocked_urlopen)
-
-
-# pyright: reportPrivateUsage=false
 
 
 @pytest.mark.parametrize("code", SUCCESSES)

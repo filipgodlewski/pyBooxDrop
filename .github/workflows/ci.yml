@@ -32,4 +32,7 @@ jobs:
         run: uv run basedpyright
 
       - name: Run pytest (non-e2e)
-        run: uv run pytest
+        run: uv run coverage run -m pytest
+
+      - name: Check coverage
+        run: uv run coverage report

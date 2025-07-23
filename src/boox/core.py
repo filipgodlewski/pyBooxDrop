@@ -2,7 +2,6 @@ import warnings
 
 from pydantic import ConfigDict, TypeAdapter, validate_call
 
-from boox.__about__ import __version__
 from boox.api.users import UsersApi
 from boox.client import BaseHttpClient
 from boox.models.enums import BooxUrl
@@ -18,7 +17,7 @@ class Boox:
         Example 1, using as a context manager.
 
         >>> # Given it is the very first connection, and no token is available:
-        >>> with Boox(base_url="https://eur.boox.com/api/1/") as client:
+        >>> with Boox(base_url="https://eur.boox.com") as client:
         ...     payload = {"mobi": "foo@bar.com"}
         ...     client.users.send_verification_code(payload=payload)
         SendVerifyResponse(<0: SUCCESS>)
@@ -45,10 +44,7 @@ class Boox:
         self._base_url: str | None = base_url
         self.client: HttpClient = client or BaseHttpClient()
         self.users = UsersApi(self)
-        self.client.headers.update({
-            "User-Agent": f"python-boox/{__version__}",
-            "Content-Type": "application/json",
-        })
+        self.client.headers.update({"Content-Type": "application/json"})
 
     def __enter__(self):
         return self
@@ -86,6 +82,7 @@ class Boox:
 
     def close(self):
         """An explicit way of closing the Boox client."""
-        if not self.is_closed and getattr(self, "client", None) is not None:
-            self.client.close()
-            self._is_closed = True
+        if self.is_closed or getattr(self, "client", None) is None:
+            return
+        self.client.close()
+        self._is_closed = True

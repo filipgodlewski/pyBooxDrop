@@ -11,15 +11,13 @@ You probably are ok with the simplified version.
 Mix and match however you like.
 """
 
-from boox.core import Boox
-
 # Example 1: robust
-from boox.models.enums import BooxUrl
-from boox.models.users import SendVerifyCodeRequest
+from boox import Boox, BooxUrl
+from boox.models.users import SendVerifyCodeRequest, SendVerifyResponse
 
-with Boox(base_url=BooxUrl.EUR) as client:
+with Boox(base_url=BooxUrl.EUR) as boox:
     payload = SendVerifyCodeRequest(mobi="foo@bar.com")
-    _ = client.users.send_verification_code(payload=payload)
+    _: SendVerifyResponse = boox.users.send_verification_code(payload=payload)
 
 # Example 2: simplified
 # pyright: reportArgumentType=false
@@ -29,7 +27,7 @@ with Boox(base_url=BooxUrl.EUR) as client:
 # In fact, I highly recommend using Boox as a context manager.
 # This is similar to using builtins.open().
 
-client = Boox(base_url="eur.boox.com")
+boox = Boox(base_url="eur.boox.com")
 payload = {"mobi": "foo@bar.com"}
-_ = client.users.send_verification_code(payload=payload)
-client.close()
+_: SendVerifyResponse = boox.users.send_verification_code(payload=payload)
+boox.close()

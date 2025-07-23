@@ -1,10 +1,13 @@
 import os
+import re
 import time
 from collections.abc import Callable
 from functools import wraps
+from typing import Self
 from urllib.parse import urljoin
 
 from boox.client import BaseHttpClient, BaseHTTPError
+from boox.models.enums import BooxUrl
 
 
 def with_retry[**P, T](
@@ -31,12 +34,43 @@ def with_retry[**P, T](
     return decorator
 
 
+class E2EConfig:
+    _instance = None
+    _initialized: bool = False
+
+    def __new__(cls) -> Self:
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
+    def __init__(self) -> None:
+        if self._initialized:
+            return
+        self.domain: BooxUrl = BooxUrl(os.environ["E2E_TARGET_DOMAIN"])
+        self.email_address: str = os.environ["E2E_SMTP_EMAIL"]
+        self.x_api_key: str = os.environ["E2E_SMTP_X_API_KEY"]
+        self._verification_code: str | None = None
+        self._initialized = True
+
+    @property
+    def verification_code(self) -> str | None:
+        return self._verification_code
+
+    @verification_code.setter
+    def verification_code(self, value: str):
+        match = re.compile(r"\d{6}").fullmatch(value)
+        if not match:
+            raise ValueError("Verification code must contain 6 digits")
+        self._verification_code = match.group()
+
+
 class EmailProvider:
-    def __init__(self):
-        self.address = os.environ["E2E_SMTP_EMAIL"]
+    def __init__(self, config: E2EConfig):
+        self.config = config
+        self.address = self.config.email_address
         self.client = BaseHttpClient()
         self.client.headers.update({
-            "X-API-KEY": os.environ["E2E_SMTP_X_API_KEY"],
+            "X-API-KEY": self.config.x_api_key,
             "Accept": "application/ld+json",
         })
         self.base_url = "https://api.smtp.dev"

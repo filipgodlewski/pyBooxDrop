@@ -1,4 +1,3 @@
-import os
 from collections.abc import Iterator
 from contextlib import suppress
 
@@ -8,12 +7,12 @@ from tests.api.utils import EmailProvider
 
 
 @pytest.fixture(scope="session")
-def e2e_doamin() -> str:
-    return os.environ["E2E_TARGET_DOMAIN"]
+def config() -> E2EConfig:
+    return E2EConfig()
 
 
 @pytest.fixture(scope="session")
-def email() -> Iterator[EmailProvider]:
+def email(config: E2EConfig) -> Iterator[EmailProvider]:
     """An email provider for connecting to an SMTP server.
 
     Useful for getting the verification code.
@@ -22,7 +21,7 @@ def email() -> Iterator[EmailProvider]:
     Yields:
         EmailProvider: a testing-only wrapper on httpx.Client.
     """
-    provider = EmailProvider()
+    provider = EmailProvider(config)
     yield provider
     with suppress(ValueError):
         provider.cleanup_inbox()

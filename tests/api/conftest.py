@@ -3,7 +3,7 @@ from contextlib import suppress
 
 import pytest
 
-from tests.api.utils import EmailProvider
+from tests.api.utils import E2EConfig, EmailProvider
 
 
 @pytest.fixture(scope="session")

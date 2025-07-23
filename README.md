@@ -29,6 +29,7 @@ or plug it into your own tools and scripts.
 
 ```http
 POST /users/sendVerifyCode
+POST /users/signupByPhoneOrEmail
 ```
 
 </details>

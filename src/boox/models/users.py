@@ -14,30 +14,19 @@ def soft_validate_email(value: str) -> bool:
     return False
 
 
-class SendVerifyCodeRequest(BaseModel):
-    """A request body for POST users/sendVerifyCode.
+class BaseVerificationModel(BaseModel):
+    """The base request body for verification and authentication requests.
 
     Attributes:
         area_code (str | None): Optional. Required if `mobi` is an e-mail.
         mobi (str): Required. Either mobile number or e-mail.
-        scene (str): ...
-        verify (str): ...
 
-    There are basically 2 important usages:
-    - send code to mobile,
-    - send code to email.
-
-    Examples:
-        >>> SendVerifyCodeRequest(area_code="+48", mobi="600123456")  # mobile
-        >>> SendVerifyCodeRequest(mobi="foo@bar.com")  # email
     """
 
     model_config: ClassVar[ConfigDict] = ConfigDict(frozen=True, str_strip_whitespace=True)
 
     mobi: Annotated[str, StringConstraints(min_length=6)]
     area_code: Annotated[str, StringConstraints(min_length=2, pattern=r"^\+\d+$")] | None = Field(default=None)
-    scene: str = ""
-    verify: str = ""
 
     @model_validator(mode="after")
     def check_area_code(self) -> Self:
@@ -53,5 +42,50 @@ class SendVerifyCodeRequest(BaseModel):
         return self
 
 
+class SendVerifyCodeRequest(BaseVerificationModel):
+    """A request body for POST users/sendVerifyCode.
+
+    Please refer to BaseVerificationModel for more attributes.
+
+    Attributes:
+        scene (str): Unknown.
+        verify (str): Unknown.
+
+    There are basically 2 important usages:
+    - send code to mobile,
+    - send code to email.
+
+    Examples:
+        >>> SendVerifyCodeRequest(area_code="+48", mobi="600123456")  # mobile
+        >>> SendVerifyCodeRequest(mobi="foo@bar.com")  # email
+    """
+
+    model_config: ClassVar[ConfigDict] = ConfigDict(frozen=True, str_strip_whitespace=True)
+
+    scene: str = ""
+    verify: str = ""
+
+
 class SendVerifyResponse(BaseResponse[str]):
     """Base response type with data being a str."""
+
+
+class FetchTokenRequest(BaseVerificationModel):
+    """A request body for POST users/signupByPhoneOrEmail.
+
+    Attributes:
+        code (str): The verification code received via either mobile or e-mail.
+
+    Note:
+        Verification code is 6 digits long, but is passed as a string.
+    """
+
+    code: Annotated[str, StringConstraints(pattern=r"^\d{6}$")]
+
+
+class DataToken(BaseModel):
+    token: str
+
+
+class FetchTokenResponse(BaseResponse[DataToken]):
+    """A response, with token under data key."""

@@ -10,7 +10,7 @@ class BaseResponse[T](BaseModel):
         result_code (int): Internal result code.
     """
 
-    data: T | None
+    data: T
     message: str
     result_code: int
 

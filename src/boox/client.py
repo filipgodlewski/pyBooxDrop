@@ -1,6 +1,7 @@
 import json as jsonlib
 from http import HTTPStatus
 from typing import Any, Self
+from urllib import error
 from urllib.request import Request, urlopen
 
 from pydantic import validate_call
@@ -55,13 +56,18 @@ class BaseHttpClient:
 
     @staticmethod
     def _send(request: Request) -> BaseHttpResponse:
-        with urlopen(request) as response:
-            return BaseHttpResponse(
-                code=HTTPStatus(response.status),
-                url=response.geturl(),
-                headers=response.headers,
-                content=response.read(),
-            )
+        try:
+            with urlopen(request) as r:
+                content = r.read()
+                status = r.status
+                url = r.geturl()
+                headers = dict(r.headers)
+        except error.HTTPError as e:
+            content = e.read()
+            status = e.status
+            url = e.geturl()
+            headers = dict(e.headers)
+        return BaseHttpResponse(code=HTTPStatus(status), url=url, headers=headers, content=content)
 
     @validate_call()
     def post(self, url: str, json: Any | None = None) -> BaseHttpResponse:

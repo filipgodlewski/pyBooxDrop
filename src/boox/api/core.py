@@ -20,7 +20,7 @@ class Api:
         if self._session.base_url is None:
             msg = f"{type(self._session).__name__}.base_url must be filled"
             raise ValueError(msg)
-        return urljoin(self._session.base_url, endpoint.lstrip("/"))
+        return urljoin(self._session.base_url.rstrip("/"), endpoint)
 
     def _post(self, *, endpoint: str, json: Any | None = None):
         return self._session.client.post(self._prepare_url(endpoint), json=json).raise_for_status()

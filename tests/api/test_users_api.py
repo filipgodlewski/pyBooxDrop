@@ -39,7 +39,7 @@ def test_send_verification_code_calls_post_and_parses_response(mocker: MockerFix
     result = api.send_verification_code(payload=payload)
 
     assert result == SendVerifyResponse(data="ok", message="SUCCESS", result_code=0)
-    api._post.assert_called_once_with(endpoint="/users/sendVerifyCode", json={"mobi": "foo@bar.com"})
+    api._post.assert_called_once_with(endpoint="/api/1/users/sendVerifyCode", json={"mobi": "foo@bar.com"})
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
@@ -53,7 +53,7 @@ def test_users_api_send_verification_code_integration(mocker: MockerFixture, moc
         payload = SendVerifyCodeRequest(mobi="foo@bar.com")
         result = boox.users.send_verification_code(payload=payload)
 
-    expected_url = url.value + "users/sendVerifyCode"
+    expected_url = url.value + "/api/1/users/sendVerifyCode"
     expected_json = payload.model_dump(exclude_unset=True)
     mocked_client.post.assert_called_once_with(expected_url, json=expected_json)
     mocked_response.json.assert_called_once()
@@ -78,7 +78,7 @@ def test_fetch_session_token_calls_post_and_parses_response(mocker: MockerFixtur
 
     assert result == FetchTokenResponse(data=DataToken(token=str(token)), message="SUCCESS", result_code=0)
     api._post.assert_called_once_with(
-        endpoint="/users/signupByPhoneOrEmail", json={"mobi": "foo@bar.com", "code": "123456"}
+        endpoint="/api/1/users/signupByPhoneOrEmail", json={"mobi": "foo@bar.com", "code": "123456"}
     )
 
 
@@ -94,7 +94,7 @@ def test_users_api_fetch_session_token_integration(mocker: MockerFixture, mocked
         payload = FetchTokenRequest(mobi="foo@bar.com", code="123456")
         result = boox.users.fetch_session_token(payload=payload)
 
-    expected_url = url.value + "users/signupByPhoneOrEmail"
+    expected_url = url.value + "/api/1/users/signupByPhoneOrEmail"
     expected_json = payload.model_dump(exclude_unset=True)
     mocked_client.post.assert_called_once_with(expected_url, json=expected_json)
     mocked_response.json.assert_called_once()

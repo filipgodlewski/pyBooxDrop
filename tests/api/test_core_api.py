@@ -27,22 +27,31 @@ def test_prepare_url_raises_without_base_url(mocker: MockerFixture):
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_prepare_url_joins_base_and_endpoint(mocker: MockerFixture, url: BooxUrl):
+def test_prepare_url_joins_base_and_endpoint_without_leading_slash(mocker: MockerFixture, url: BooxUrl):
     mocked_session = mocker.Mock()
     mocked_session.base_url = url
     api = DummyApi(session=mocked_session)
 
     endpoint = "endpoint"
-    assert api._prepare_url(endpoint) == f"{url.value}{endpoint}"
+    assert api._prepare_url(endpoint) == f"{url.value}/{endpoint}"
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_prepare_url_strips_leading_slash(mocker: MockerFixture, url: BooxUrl):
+def test_prepare_url_joins_base_and_endpoint_with_leading_slash(mocker: MockerFixture, url: BooxUrl):
     mocked_session = mocker.Mock()
     mocked_session.base_url = url
     api = DummyApi(session=mocked_session)
     endpoint = "/endpoint"
-    assert api._prepare_url(endpoint) == f"{url.value}{endpoint.lstrip("/")}"
+    assert api._prepare_url(endpoint) == f"{url.value}{endpoint}"
+
+
+@pytest.mark.parametrize("url", list(BooxUrl))
+def test_prepare_url_strips_trailing_slash(mocker: MockerFixture, url: BooxUrl):
+    mocked_session = mocker.Mock()
+    mocked_session.base_url = url + "/"
+    api = DummyApi(session=mocked_session)
+    endpoint = "/endpoint"
+    assert api._prepare_url(endpoint) == f"{url.value}{endpoint}"
 
 
 def test_post_calls_client_and_checks_status(mocker: MockerFixture):

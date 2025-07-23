@@ -17,7 +17,7 @@ class Boox:
         Example 1, using as a context manager.
 
         >>> # Given it is the very first connection, and no token is available:
-        >>> with Boox(base_url="https://eur.boox.com/api/1/") as client:
+        >>> with Boox(base_url="https://eur.boox.com") as client:
         ...     payload = {"mobi": "foo@bar.com"}
         ...     client.users.send_verification_code(payload=payload)
         SendVerifyResponse(<0: SUCCESS>)

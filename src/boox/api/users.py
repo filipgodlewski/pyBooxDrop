@@ -30,7 +30,7 @@ class UsersApi(Api):
         Returns:
             SendVerifyResponse: The validated, generic response that is always received from the server.
         """
-        response = self._post(endpoint="/users/sendVerifyCode", json=payload.model_dump(exclude_unset=True))
+        response = self._post(endpoint="/api/1/users/sendVerifyCode", json=payload.model_dump(exclude_unset=True))
         return SendVerifyResponse.model_validate(response.json())
 
     @validate_call()
@@ -48,5 +48,5 @@ class UsersApi(Api):
         Returns:
             FetchTokenResponse: The validated response containing a session token.
         """
-        response = self._post(endpoint="/users/signupByPhoneOrEmail", json=payload.model_dump(exclude_unset=True))
+        response = self._post(endpoint="/api/1/users/signupByPhoneOrEmail", json=payload.model_dump(exclude_unset=True))
         return FetchTokenResponse.model_validate(response.json())

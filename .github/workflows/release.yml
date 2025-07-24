@@ -19,6 +19,9 @@ jobs:
         with:
           python-version: 3.12
 
+      - name: Check if uv lock is up to date
+        run: uv lock --check
+
       - name: Install build dependencies
         run: uv sync
 

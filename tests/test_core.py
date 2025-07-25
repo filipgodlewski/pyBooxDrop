@@ -1,9 +1,11 @@
 import gc
 import warnings
+from collections.abc import Callable
 from unittest import mock
+from uuid import UUID, uuid1
 
 import pytest
-from pydantic import ValidationError
+from pydantic import SecretStr, ValidationError
 from pytest_mock import MockerFixture
 
 from boox.api.users import UsersApi
@@ -175,3 +177,46 @@ def test_boox_users_api_is_initialized(mocked_client: mock.Mock):
 def test_boox_sets_default_headers(mocked_client: mock.Mock):
     boox = Boox(client=mocked_client)
     assert boox.client.headers == {"Content-Type": "application/json"}
+
+
+def test_boox_token_is_unset_by_default():
+    boox = Boox()
+    assert not boox.token
+    assert not boox.client.headers.get("Authorization")
+
+
+def test_boox_token_is_set_from_constructor():
+    token = uuid1()
+    boox = Boox(token=str(token))
+    assert boox.token == str(token)
+    assert boox.client.headers.get("Authorization") == f"Bearer {token!s}"
+
+
+def test_boox_token_is_extracted_from_client_headers(mocked_client: mock.Mock):
+    token = uuid1()
+    mocked_client.headers.update({"Authorization": f"Bearer {token!s}"})
+    boox = Boox(client=mocked_client)
+    assert boox.token == str(token)
+    assert boox.client.headers.get("Authorization") == f"Bearer {token!s}"
+
+
+def test_client_token_takes_precedence_over_inline_token(mocked_client: mock.Mock):
+    client_token = uuid1()
+    inline_token = uuid1()
+    mocked_client.headers.update({"Authorization": f"Bearer {client_token!s}"})
+    boox = Boox(client=mocked_client, token=str(inline_token))
+    assert boox.token == str(client_token)
+    assert boox.client.headers.get("Authorization") == f"Bearer {client_token!s}"
+
+
+def cast_to_secret_str(u: UUID) -> SecretStr:
+    return SecretStr(str(u))
+
+
+@pytest.mark.parametrize("wrapper", [str, cast_to_secret_str])
+def test_token_setter_accepts_str_and_secretstr(wrapper: Callable[[UUID], str | SecretStr]):
+    token = uuid1()
+    boox = Boox()
+    boox.token = wrapper(token)
+    assert boox.token == str(token)
+    assert boox.client.headers.get("Authorization") == f"Bearer {token!s}"

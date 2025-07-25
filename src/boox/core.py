@@ -2,7 +2,7 @@ import re
 import warnings
 from typing import cast
 
-from pydantic import ConfigDict, TypeAdapter, validate_call
+from pydantic import ConfigDict, SecretStr, TypeAdapter, validate_call
 
 from boox.api.users import UsersApi
 from boox.client import BaseHttpClient
@@ -85,7 +85,7 @@ class Boox:
         """Property to conveniently store and set the authorization token for the majority of API calls.
 
         Returns:
-            SecretStr: The token itself, hidden behind pydantic's SecretStr. Can be revealed using `.get_secret_value()`
+            str: The token itself, plain, not protected.
         """
         header = cast(str, self.client.headers.get("Authorization", ""))
         if match := re.compile(r"Bearer (?P<token>.+)").fullmatch(header):
@@ -93,7 +93,9 @@ class Boox:
         return ""
 
     @token.setter
-    def token(self, value: str):
+    def token(self, value: SecretStr | str):
+        if isinstance(value, SecretStr):
+            value = value.get_secret_value()
         self.client.headers.update({"Authorization": f"Bearer {value}"})
 
     @property

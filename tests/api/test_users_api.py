@@ -76,7 +76,8 @@ def test_fetch_session_token_calls_post_and_parses_response(mocker: MockerFixtur
     payload = FetchTokenRequest(mobi="foo@bar.com", code="123456")
     result = api.fetch_session_token(payload=payload)
 
-    assert result == FetchTokenResponse(data=DataToken(token=str(token)), message="SUCCESS", result_code=0)
+    data = FetchTokenResponse.model_validate({"data": {"token": str(token)}, "message": "SUCCESS", "result_code": 0})
+    assert result == data
     api._post.assert_called_once_with(
         endpoint="/api/1/users/signupByPhoneOrEmail", json={"mobi": "foo@bar.com", "code": "123456"}
     )
@@ -99,7 +100,8 @@ def test_users_api_fetch_session_token_integration(mocker: MockerFixture, mocked
     mocked_client.post.assert_called_once_with(expected_url, json=expected_json)
     mocked_response.json.assert_called_once()
     assert isinstance(result, FetchTokenResponse)
-    assert result.data == DataToken(token=str(token))
+    data = DataToken.model_validate({"token": str(token)})
+    assert result.data == data
 
 
 @e2e

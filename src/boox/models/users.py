@@ -1,8 +1,16 @@
 import re
 from contextlib import suppress
 from typing import Annotated, ClassVar, Self
-
-from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator, validate_email
+from pydantic import (
+    BaseModel,
+    ConfigDict,
+    Field,
+    PlainSerializer,
+    SecretStr,
+    StringConstraints,
+    model_validator,
+    validate_email,
+)
 from pydantic_core import PydanticCustomError
 
 from boox.models.base import BaseResponse
@@ -84,7 +92,7 @@ class FetchTokenRequest(BaseVerificationModel):
 
 
 class DataToken(BaseModel):
-    token: str
+    token: Annotated[SecretStr, PlainSerializer(lambda v: v.get_secret_value(), return_type=str, when_used="always")]
 
 
 class FetchTokenResponse(BaseResponse[DataToken]):

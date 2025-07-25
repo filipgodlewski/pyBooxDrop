@@ -150,7 +150,7 @@ wheels = [
 
 [[package]]
 name = "pybooxdrop"
-version = "0.2.3"
+version = "0.3.3"
 source = { editable = "." }
 dependencies = [
     { name = "pydantic", extra = ["email"] },

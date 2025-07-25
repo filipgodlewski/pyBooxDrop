@@ -1,6 +1,6 @@
 from pydantic import validate_call
 
-from boox.api.core import Api
+from boox.api.core import Api, requires_token
 from boox.models.users import (
     FetchTokenRequest,
     FetchTokenResponse,
@@ -57,6 +57,7 @@ class UsersApi(Api):
         response = self._post(endpoint="/api/1/users/signupByPhoneOrEmail", json=payload.model_dump(exclude_unset=True))
         return FetchTokenResponse.model_validate(response.json())
 
+    @requires_token
     def synchronize_token(self) -> SyncTokenResponse:
         """A call to check token authenticity and validity.
 

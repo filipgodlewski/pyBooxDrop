@@ -1,4 +1,6 @@
+import re
 import warnings
+from typing import cast
 
 from pydantic import ConfigDict, TypeAdapter, validate_call
 
@@ -33,7 +35,7 @@ class Boox:
         >>> client.close()
     """
 
-    def __init__(self, client: HttpClient | None = None, base_url: BooxUrl | None = None) -> None:
+    def __init__(self, client: HttpClient | None = None, base_url: BooxUrl | None = None, token: str = "") -> None:
         if is_closed := getattr(client, "is_closed", False):
             raise ValueError("Cannot initialize Boox with a closed connection")
 
@@ -43,8 +45,11 @@ class Boox:
         self._is_closed: bool = is_closed
         self._base_url: str | None = base_url
         self.client: HttpClient = client or BaseHttpClient()
-        self.users = UsersApi(self)
         self.client.headers.update({"Content-Type": "application/json"})
+        if not self.client.headers.get("Authorization") and token:
+            self.client.headers.update({"Authorization": f"Bearer {token}"})
+
+        self.users = UsersApi(self)
 
     def __enter__(self):
         return self
@@ -74,6 +79,22 @@ class Boox:
     @validate_call(config=ConfigDict(use_enum_values=True))
     def base_url(self, value: BooxUrl):
         self._base_url = value
+
+    @property
+    def token(self):
+        """Property to conveniently store and set the authorization token for the majority of API calls.
+
+        Returns:
+            SecretStr: The token itself, hidden behind pydantic's SecretStr. Can be revealed using `.get_secret_value()`
+        """
+        header = cast(str, self.client.headers.get("Authorization", ""))
+        if match := re.compile(r"Bearer (?P<token>.+)").fullmatch(header):
+            return cast(str, match.group("token"))
+        return ""
+
+    @token.setter
+    def token(self, value: str):
+        self.client.headers.update({"Authorization": f"Bearer {value}"})
 
     @property
     def is_closed(self):

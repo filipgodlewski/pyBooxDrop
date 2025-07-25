@@ -25,6 +25,10 @@ class HttpClient(Protocol):
         """A method to request a `POST` type response."""
         ...
 
+    def get(self, url: str, *args: Any, **kwargs: Any) -> HttpResponse:
+        """A method to request a `GET` type response."""
+        ...
+
     def close(self) -> None:
         """A method to close the current or global connection."""
         ...

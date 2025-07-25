@@ -107,7 +107,7 @@ def test_users_api_fetch_session_token_integration(mocker: MockerFixture, mocked
 @e2e
 @pytest.mark.order(0)
 def test_send_verification_code_e2e(config: E2EConfig, email: EmailProvider):
-    payload = SendVerifyCodeRequest(mobi=config.email_address)
+    payload = SendVerifyCodeRequest.model_validate({"mobi": config.email_address})
 
     with Boox(base_url=config.domain) as boox:
         response = boox.users.send_verification_code(payload=payload)
@@ -123,9 +123,21 @@ def test_send_verification_code_e2e(config: E2EConfig, email: EmailProvider):
 def test_fetch_session_token_e2e(config: E2EConfig):
     if not config.verification_code:
         pytest.skip("Verification code was either not obtained or not set")
-    payload = FetchTokenRequest(mobi=config.email_address, code=config.verification_code)
+    payload = FetchTokenRequest.model_validate({"mobi": config.email_address, "code": config.verification_code})
 
     with Boox(base_url=config.domain) as boox:
         response = boox.users.fetch_session_token(payload=payload)
 
     assert response.data.token
+    config.token = response.data.token
+
+
+@e2e
+def test_synchronize_token_e2e(config: E2EConfig):
+    if not config.token:
+        pytest.skip("Token was either not obtainer or not set")
+
+    with Boox(base_url=config.domain, token=config.token.get_secret_value()) as boox:
+        response = boox.users.synchronize_token()
+
+    assert response.token_expired_at

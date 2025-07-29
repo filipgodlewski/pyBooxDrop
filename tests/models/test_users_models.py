@@ -1,7 +1,17 @@
+import datetime
+import re
+
 import pytest
 from pydantic import ValidationError
 
-from boox.models.users import FetchTokenRequest, SendVerifyCodeRequest, soft_validate_email
+from boox.models.users import (
+    DataSession,
+    DataToken,
+    FetchTokenRequest,
+    SendVerifyCodeRequest,
+    SyncTokenResponse,
+    soft_validate_email,
+)
 
 EMAIL = "foo@bar.com"
 INVALID_EMAIL = "foobar@baz"
@@ -53,3 +63,38 @@ def test_validation_fails_when_verification_code_does_not_match_pattern():
 
 def test_validation_succeeds_when_verification_code_matches_pattern():
     assert FetchTokenRequest.model_validate({"mobi": EMAIL, "code": "123456"})
+
+
+def test_token_str_is_masked():
+    data = DataToken.model_validate({"token": "xyz123"})
+    assert re.compile(r"\*+").fullmatch(str(data.token))
+
+
+def test_token_is_public_in_model_dump():
+    value = "xyz123"
+    data = DataToken.model_validate({"token": value})
+    dumped = data.model_dump()
+    assert dumped.get("token") == value
+
+
+def test_token_is_public_in_json_dump():
+    value = "xyz123"
+    data = DataToken.model_validate({"token": value})
+    dumped = data.model_dump_json()
+    assert re.compile(r'{"token":"xyz123"}').fullmatch(dumped)
+
+
+def test_sync_token_response_parses_nested_data_correctly():
+    data = SyncTokenResponse.model_validate({
+        "data": {
+            "channels": (),
+            "cookie_name": "foo",
+            "expires": datetime.datetime.now(tz=datetime.UTC),
+            "session_id": "bar",
+        },
+        "message": "SUCCESS",
+        "result_code": 0,
+        "tokenExpiredAt": 1,
+    })
+    assert isinstance(data.data, DataSession)
+    assert data.token_expired_at

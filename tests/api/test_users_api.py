@@ -107,7 +107,7 @@ def test_users_api_fetch_session_token_integration(mocker: MockerFixture, mocked
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_1(mocker: MockerFixture, mocked_client: mock.Mock, url: BooxUrl):
+def test_users_api_sync_token_integration(mocker: MockerFixture, mocked_client: mock.Mock, url: BooxUrl):
     token = str(uuid1())
     mocked_response = mocker.Mock()
     data = {

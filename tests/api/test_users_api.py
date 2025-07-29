@@ -175,7 +175,7 @@ def test_synchronize_token_e2e(config: E2EConfig):
     if not config.token:
         pytest.skip("Token was either not obtainer or not set")
 
-    with Boox(base_url=config.domain, token=config.token.get_secret_value()) as boox:
+    with Boox(base_url=config.domain, token=config.token) as boox:
         response = boox.users.synchronize_token()
 
     assert response.token_expired_at

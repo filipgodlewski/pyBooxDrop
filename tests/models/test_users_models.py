@@ -85,16 +85,19 @@ def test_token_is_public_in_json_dump():
 
 
 def test_sync_token_response_parses_nested_data_correctly():
+    session_expiry = datetime.datetime.now(tz=datetime.UTC).replace(microsecond=0)
+    token_expiry = datetime.datetime.now(tz=datetime.UTC).replace(microsecond=0) + datetime.timedelta(days=180)
     data = SyncTokenResponse.model_validate({
         "data": {
             "channels": (),
             "cookie_name": "foo",
-            "expires": datetime.datetime.now(tz=datetime.UTC),
+            "expires": session_expiry.strftime("%Y-%m-%dT%H:%M:%SZ"),
             "session_id": "bar",
         },
         "message": "SUCCESS",
         "result_code": 0,
-        "tokenExpiredAt": 1,
+        "tokenExpiredAt": int(token_expiry.timestamp()),
     })
     assert isinstance(data.data, DataSession)
-    assert data.token_expired_at
+    assert data.token_expired_at == token_expiry
+    assert data.data.expires == session_expiry

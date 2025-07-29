@@ -113,4 +113,4 @@ class SyncTokenResponse(BaseResponse[DataSession]):
 
     model_config: ClassVar[ConfigDict] = ConfigDict(serialize_by_alias=True)
 
-    token_expired_at: int = Field(alias="tokenExpiredAt")
+    token_expired_at: datetime.datetime = Field(alias="tokenExpiredAt")

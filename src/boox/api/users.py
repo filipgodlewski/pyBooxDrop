@@ -65,7 +65,7 @@ class UsersApi(Api):
 
         This call **requires** the token to be passed as an Authorization header, e.g.:
             >>> {"Authorization": "Bearer xyz123abc"}
-        That is also the reason why this call is pre-validates the client header.
+        That is also the reason why this call pre-validates the client header.
 
         Returns:
             SyncTokenResponse: The validated response containing information about token expiry date, and session metadata.

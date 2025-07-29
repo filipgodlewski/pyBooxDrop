@@ -19,7 +19,7 @@ with Boox(base_url=BooxUrl.EUR, token=TOKEN) as boox:
 
 # Although the original response has tokenExpiredAt key, it is aliased for more pythonic use
 
-# In the original response it is an integer, but this integer is in fact a UNIX epoch timestamp.
-# For example 1768815112 is an equivalent of GMT: Monday, 19 January 2026 09:31:52
+# In the original response it is an integer, which in fact is a UNIX epoch timestamp.
+# For example 1768815112 is an equivalent of GMT: Monday, 19 January 2026 09:31:52.
 # For convenience, it is being cast to the datetime.datetime object during data validation.
-expiration_date: datetime.datetime = response.token_expired_at
+_: datetime.datetime = response.token_expired_at

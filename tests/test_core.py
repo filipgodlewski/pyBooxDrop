@@ -1,9 +1,11 @@
 import gc
 import warnings
+from collections.abc import Callable
 from unittest import mock
+from uuid import UUID, uuid1
 
 import pytest
-from pydantic import ValidationError
+from pydantic import SecretStr, ValidationError
 from pytest_mock import MockerFixture
 
 from boox.api.users import UsersApi
@@ -13,9 +15,13 @@ from boox.models.enums import BooxUrl
 # pyright: reportPrivateUsage=false
 
 
-def shows_all_members(e: ValidationError) -> bool:
+def _shows_all_members(e: ValidationError) -> bool:
     errors = e.errors(include_url=False, include_context=False, include_input=False)
     return all(m.value in errors[0]["msg"] for m in list(BooxUrl))
+
+
+def _cast_to_secret_str(u: UUID) -> SecretStr:
+    return SecretStr(str(u))
 
 
 def test_boox_initializes_with_defaults():
@@ -50,7 +56,7 @@ def test_client_base_url_overrides_constructor_value(mocked_client: mock.Mock):
 
 def test_boox_raises_validation_error_for_invalid_url(mocked_client: mock.Mock):
     mocked_client.base_url = "http://random.url"
-    with pytest.raises(ValidationError, match="Input should be", check=shows_all_members):
+    with pytest.raises(ValidationError, match="Input should be", check=_shows_all_members):
         Boox(client=mocked_client)
 
 
@@ -63,7 +69,7 @@ def test_boox_base_url_can_be_set(mocked_client: mock.Mock, url: BooxUrl):
 
 def test_boox_base_url_set_raises_on_invalid_url(mocked_client: mock.Mock):
     boox = Boox(client=mocked_client)
-    with pytest.raises(ValidationError, match="Input should be", check=shows_all_members):
+    with pytest.raises(ValidationError, match="Input should be", check=_shows_all_members):
         boox.base_url = "http://random.url"  # pyright: ignore[reportAttributeAccessIssue]
 
 
@@ -175,3 +181,43 @@ def test_boox_users_api_is_initialized(mocked_client: mock.Mock):
 def test_boox_sets_default_headers(mocked_client: mock.Mock):
     boox = Boox(client=mocked_client)
     assert boox.client.headers == {"Content-Type": "application/json"}
+
+
+def test_boox_token_is_unset_by_default():
+    boox = Boox()
+    assert not boox.token
+    assert not boox.client.headers.get("Authorization")
+
+
+def test_boox_token_is_extracted_from_client_headers(mocked_client: mock.Mock):
+    token = uuid1()
+    mocked_client.headers.update({"Authorization": f"Bearer {token!s}"})
+    boox = Boox(client=mocked_client)
+    assert boox.token == str(token)
+    assert boox.client.headers.get("Authorization") == f"Bearer {token!s}"
+
+
+def test_client_token_takes_precedence_over_inline_token(mocked_client: mock.Mock):
+    client_token = uuid1()
+    inline_token = uuid1()
+    mocked_client.headers.update({"Authorization": f"Bearer {client_token!s}"})
+    boox = Boox(client=mocked_client, token=str(inline_token))
+    assert boox.token == str(client_token)
+    assert boox.client.headers.get("Authorization") == f"Bearer {client_token!s}"
+
+
+@pytest.mark.parametrize("wrapper", [str, _cast_to_secret_str])
+def test_boox_constructor_accepts_str_and_secretstr_in_constructor(wrapper: Callable[[UUID], str | SecretStr]):
+    token = uuid1()
+    boox = Boox(token=wrapper(token))
+    assert boox.token == str(token)
+    assert boox.client.headers.get("Authorization") == f"Bearer {token!s}"
+
+
+@pytest.mark.parametrize("wrapper", [str, _cast_to_secret_str])
+def test_token_setter_accepts_str_and_secretstr(wrapper: Callable[[UUID], str | SecretStr]):
+    token = uuid1()
+    boox = Boox()
+    boox.token = wrapper(token)
+    assert boox.token == str(token)
+    assert boox.client.headers.get("Authorization") == f"Bearer {token!s}"

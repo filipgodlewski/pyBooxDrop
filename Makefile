@@ -1,5 +1,5 @@
 sync:
-	uv sync
+	uv sync --locked
 
 lint: sync
 	uv run ruff check --no-fix

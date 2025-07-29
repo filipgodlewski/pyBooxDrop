@@ -6,6 +6,8 @@ from functools import wraps
 from typing import Self
 from urllib.parse import urljoin
 
+from pydantic import SecretStr
+
 from boox.client import BaseHttpClient, BaseHTTPError
 from boox.models.enums import BooxUrl
 
@@ -50,6 +52,7 @@ class E2EConfig:
         self.email_address: str = os.environ["E2E_SMTP_EMAIL"]
         self.x_api_key: str = os.environ["E2E_SMTP_X_API_KEY"]
         self._verification_code: str | None = None
+        self._token: SecretStr = SecretStr("")
         self._initialized = True
 
     @property
@@ -62,6 +65,14 @@ class E2EConfig:
         if not match:
             raise ValueError("Verification code must contain 6 digits")
         self._verification_code = match.group()
+
+    @property
+    def token(self) -> SecretStr:
+        return self._token
+
+    @token.setter
+    def token(self, value: SecretStr):
+        self._token = value
 
 
 class EmailProvider:

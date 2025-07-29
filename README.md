@@ -30,6 +30,7 @@ or plug it into your own tools and scripts.
 ```http
 POST /api/1/users/sendVerifyCode
 POST /api/1/users/signupByPhoneOrEmail
+GET /api/1/users/syncToken
 ```
 
 </details>

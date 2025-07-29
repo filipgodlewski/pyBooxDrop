@@ -15,7 +15,7 @@ from boox.models.enums import BooxUrl
 # pyright: reportPrivateUsage=false
 
 
-def shows_all_members(e: ValidationError) -> bool:
+def _shows_all_members(e: ValidationError) -> bool:
     errors = e.errors(include_url=False, include_context=False, include_input=False)
     return all(m.value in errors[0]["msg"] for m in list(BooxUrl))
 
@@ -56,7 +56,7 @@ def test_client_base_url_overrides_constructor_value(mocked_client: mock.Mock):
 
 def test_boox_raises_validation_error_for_invalid_url(mocked_client: mock.Mock):
     mocked_client.base_url = "http://random.url"
-    with pytest.raises(ValidationError, match="Input should be", check=shows_all_members):
+    with pytest.raises(ValidationError, match="Input should be", check=_shows_all_members):
         Boox(client=mocked_client)
 
 
@@ -69,7 +69,7 @@ def test_boox_base_url_can_be_set(mocked_client: mock.Mock, url: BooxUrl):
 
 def test_boox_base_url_set_raises_on_invalid_url(mocked_client: mock.Mock):
     boox = Boox(client=mocked_client)
-    with pytest.raises(ValidationError, match="Input should be", check=shows_all_members):
+    with pytest.raises(ValidationError, match="Input should be", check=_shows_all_members):
         boox.base_url = "http://random.url"  # pyright: ignore[reportAttributeAccessIssue]
 
 

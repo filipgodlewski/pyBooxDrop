@@ -20,6 +20,10 @@ def shows_all_members(e: ValidationError) -> bool:
     return all(m.value in errors[0]["msg"] for m in list(BooxUrl))
 
 
+def _cast_to_secret_str(u: UUID) -> SecretStr:
+    return SecretStr(str(u))
+
+
 def test_boox_initializes_with_defaults():
     assert Boox()
 
@@ -185,13 +189,6 @@ def test_boox_token_is_unset_by_default():
     assert not boox.client.headers.get("Authorization")
 
 
-def test_boox_token_is_set_from_constructor():
-    token = uuid1()
-    boox = Boox(token=str(token))
-    assert boox.token == str(token)
-    assert boox.client.headers.get("Authorization") == f"Bearer {token!s}"
-
-
 def test_boox_token_is_extracted_from_client_headers(mocked_client: mock.Mock):
     token = uuid1()
     mocked_client.headers.update({"Authorization": f"Bearer {token!s}"})
@@ -209,11 +206,15 @@ def test_client_token_takes_precedence_over_inline_token(mocked_client: mock.Moc
     assert boox.client.headers.get("Authorization") == f"Bearer {client_token!s}"
 
 
-def cast_to_secret_str(u: UUID) -> SecretStr:
-    return SecretStr(str(u))
+@pytest.mark.parametrize("wrapper", [str, _cast_to_secret_str])
+def test_boox_constructor_accepts_str_and_secretstr_in_constructor(wrapper: Callable[[UUID], str | SecretStr]):
+    token = uuid1()
+    boox = Boox(token=wrapper(token))
+    assert boox.token == str(token)
+    assert boox.client.headers.get("Authorization") == f"Bearer {token!s}"
 
 
-@pytest.mark.parametrize("wrapper", [str, cast_to_secret_str])
+@pytest.mark.parametrize("wrapper", [str, _cast_to_secret_str])
 def test_token_setter_accepts_str_and_secretstr(wrapper: Callable[[UUID], str | SecretStr]):
     token = uuid1()
     boox = Boox()

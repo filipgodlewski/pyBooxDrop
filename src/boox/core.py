@@ -35,7 +35,9 @@ class Boox:
         >>> client.close()
     """
 
-    def __init__(self, client: HttpClient | None = None, base_url: BooxUrl | None = None, token: str = "") -> None:
+    def __init__(
+        self, client: HttpClient | None = None, base_url: BooxUrl | None = None, token: str | SecretStr = ""
+    ) -> None:
         if is_closed := getattr(client, "is_closed", False):
             raise ValueError("Cannot initialize Boox with a closed connection")
 
@@ -47,6 +49,8 @@ class Boox:
         self.client: HttpClient = client or BaseHttpClient()
         self.client.headers.update({"Content-Type": "application/json"})
         if not self.client.headers.get("Authorization") and token:
+            if isinstance(token, SecretStr):
+                token = token.get_secret_value()
             self.client.headers.update({"Authorization": f"Bearer {token}"})
 
         self.users = UsersApi(self)

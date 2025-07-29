@@ -11,7 +11,7 @@ from boox import Boox, BooxUrl
 from boox.models.users import FetchTokenRequest, FetchTokenResponse
 
 with Boox(base_url=BooxUrl.PUSH) as boox:
-    payload = FetchTokenRequest(mobi="foo@bar.com", code="123456")
+    payload = FetchTokenRequest.model_validate({"mobi": "foo@bar.com", "code": "123456"})
     response: FetchTokenResponse = boox.users.fetch_session_token(payload=payload)
 
 # By default, received token is hidden from __str__ and __repr__.

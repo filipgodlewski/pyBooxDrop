@@ -16,7 +16,7 @@ from boox import Boox, BooxUrl
 from boox.models.users import SendVerifyCodeRequest, SendVerifyResponse
 
 with Boox(base_url=BooxUrl.EUR) as boox:
-    payload = SendVerifyCodeRequest(mobi="foo@bar.com")
+    payload = SendVerifyCodeRequest.model_validate({"mobi": "foo@bar.com"})
     _: SendVerifyResponse = boox.users.send_verification_code(payload=payload)
 
 # Example 2: simplified

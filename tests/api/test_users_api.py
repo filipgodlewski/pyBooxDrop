@@ -39,7 +39,7 @@ def test_send_verification_code_calls_post_and_parses_response(mocker: MockerFix
 
     api._post = mocker.Mock(return_value=mocked_response)
 
-    payload = SendVerifyCodeRequest(mobi="foo@bar.com")
+    payload = SendVerifyCodeRequest.model_validate({"mobi": "foo@bar.com"})
     result = api.send_verification_code(payload=payload)
 
     assert result == SendVerifyResponse(data="ok", message="SUCCESS", result_code=0)
@@ -54,7 +54,7 @@ def test_users_api_send_verification_code_integration(mocker: MockerFixture, moc
     mocked_client.post.return_value = mocked_response
 
     with Boox(client=mocked_client, base_url=url) as boox:
-        payload = SendVerifyCodeRequest(mobi="foo@bar.com")
+        payload = SendVerifyCodeRequest.model_validate({"mobi": "foo@bar.com"})
         result = boox.users.send_verification_code(payload=payload)
 
     expected_url = url.value + "/api/1/users/sendVerifyCode"
@@ -75,7 +75,7 @@ def test_fetch_session_token_calls_post_and_parses_response(mocker: MockerFixtur
 
     api._post = mocker.Mock(return_value=mocked_response)
 
-    payload = FetchTokenRequest(mobi="foo@bar.com", code="123456")
+    payload = FetchTokenRequest.model_validate({"mobi": "foo@bar.com", "code": "123456"})
     result = api.fetch_session_token(payload=payload)
 
     data = FetchTokenResponse.model_validate({"data": {"token": token}, "message": "SUCCESS", "result_code": 0})
@@ -94,7 +94,7 @@ def test_users_api_fetch_session_token_integration(mocker: MockerFixture, mocked
     mocked_client.post.return_value = mocked_response
 
     with Boox(client=mocked_client, base_url=url) as boox:
-        payload = FetchTokenRequest(mobi="foo@bar.com", code="123456")
+        payload = FetchTokenRequest.model_validate({"mobi": "foo@bar.com", "code": "123456"})
         result = boox.users.fetch_session_token(payload=payload)
 
     expected_url = url.value + "/api/1/users/signupByPhoneOrEmail"

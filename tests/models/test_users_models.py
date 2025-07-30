@@ -85,7 +85,7 @@ def test_token_is_public_in_json_dump():
     assert re.compile(r'{"token":"xyz123"}').fullmatch(dumped)
 
 
-def test_sync_token_response_parses_nested_data_correctly():
+def test_sync_token_response_parses_token_expiration_date_correctly():
     token_expiry = datetime.datetime.now(tz=datetime.UTC).replace(microsecond=0) + datetime.timedelta(days=180)
     data = SyncTokenResponse.model_validate({
         "data": None,

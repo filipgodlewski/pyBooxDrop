@@ -25,9 +25,7 @@ or plug it into your own tools and scripts.
 
 ### Supported endpoints
 
-<details>
-
-  <summary>configUsers/ endpoints</summary>
+<details><summary>configUsers/ endpoints</summary>
 
 ```http
 GET /api/1/configUsers/one
@@ -35,9 +33,7 @@ GET /api/1/configUsers/one
 
 </details>
 
-<details>
-
-  <summary>users/ endpoints</summary>
+<details><summary>users/ endpoints</summary>
 
 ```http
 GET /api/1/users/syncToken

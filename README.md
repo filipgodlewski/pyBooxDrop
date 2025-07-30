@@ -2,7 +2,7 @@
 
 ![GitHub Actions Workflow Status - Unit Tests](https://img.shields.io/github/actions/workflow/status/filipgodlewski/pybooxdrop/ci.yml?style=for-the-badge&label=unit%20tests)
 ![GitHub Actions Workflow Status - E2E Tests](https://img.shields.io/github/actions/workflow/status/filipgodlewski/pybooxdrop/e2e.yml?style=for-the-badge&label=E2E%20tests)
-[![PyPI - Minimum Required Python Version](https://img.shields.io/pypi/pyversions/pybooxdrop?style=for-the-badge&label=Min.%20version&labelColor=3776AB&color=FFD43B&logo=python&logoColor=white)](https://pypi.org/project/pybooxdrop/)
+[![PyPI - Supported Python Version](https://img.shields.io/pypi/pyversions/pybooxdrop?style=for-the-badge&label=Py&labelColor=3776AB&color=FFD43B&logo=python&logoColor=white)](https://pypi.org/project/pybooxdrop/)
 [![PyPI - Version](https://img.shields.io/pypi/v/pybooxdrop?style=for-the-badge&color=3775A9)](https://pypi.org/project/pybooxdrop/)
 [![GitHub License](https://img.shields.io/github/license/filipgodlewski/pybooxdrop?style=for-the-badge&color=3DA639)](https://github.com/filipgodlewski/pyBooxDrop/blob/main/LICENSE)
 
@@ -109,7 +109,7 @@ This gives you full control over things like:
 
 ```bash
 # to run all but e2e tests do the following:
-uv sync
+uv sync --locked
 uv run pytest
 ```
 
@@ -129,7 +129,7 @@ and they connect with the real BOOXDrop server, it is not recommended to run the
 # E2E_SMTP_EMAIL - the e-mail address on smtp.dev
 # E2E_SMTP_X_API_KEY - the X-API-KEY for the account
 # E2E_TARGET_DOMAIN - the target BOOXDrop domain, e.g. push.boox.com
-uv sync
+uv sync --locked
 uv run pytest -m e2e --e2e
 ```
 
@@ -143,8 +143,28 @@ make e2e
 - `E2E_TARGET_DOMAIN` is the domain that the Boox account is used with.
   AFAIK it can be any Boox' domain, because the account is not bound to any in particular.
   This might change in the future though, so I would rather play safe there.
-- `X-API-KEY` for [SMTP.dev](https://smtp.dev/) is required, as this is the client that is being used.
+- `E2E_SMTP_X_API_KEY` relates to `X-API-KEY` for [SMTP.dev](https://smtp.dev/).
+  It is required, as this is the client that is being used.
   Currently there are no plans to support other providers.
+
+### Running full Quality Assurance
+
+To save time and resources, before each commit or push
+(especially before you create a PR), please run these commands:
+
+```bash
+uv sync --locked
+uv run ruff check --no-fix
+uv run basedpyright
+uv run coverage run -m pytest
+uv run coverage report
+```
+
+Alternatively, use:
+
+```bash
+make qa
+```
 
 ---
 
@@ -159,8 +179,8 @@ Got ideas, feedback, or feature requests? Feel free to open an issue or pull req
 Contributions are welcome!
 
 - Please fork the repository and create a branch for your feature or bugfix.
-- Use pytest to run tests and add new tests when applicable.
-- Follow the existing code style, checked by ruff, bandit and pyupgrade.
+- Use `pytest` to run tests and add new tests when applicable.
+- Follow the existing code style, checked by `ruff` and `basedpyright`.
 - Open a pull request with a clear description of your changes.
 
 ---

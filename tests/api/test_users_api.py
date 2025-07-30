@@ -17,7 +17,7 @@ from boox.models.users import (
     FetchTokenResponse,
     SendVerifyCodeRequest,
     SendVerifyResponse,
-    SyncTokenResponse,
+    SyncSessionTokenResponse,
 )
 from tests.api.utils import E2EConfig, EmailProvider
 from tests.conftest import e2e
@@ -107,7 +107,7 @@ def test_users_api_fetch_session_token_integration(mocker: MockerFixture, mocked
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_users_api_sync_token_integration(mocker: MockerFixture, mocked_client: mock.Mock, url: BooxUrl):
+def test_users_api_sync_session_token_integration(mocker: MockerFixture, mocked_client: mock.Mock, url: BooxUrl):
     token = str(uuid1())
     mocked_response = mocker.Mock()
     data = {
@@ -123,22 +123,22 @@ def test_users_api_sync_token_integration(mocker: MockerFixture, mocked_client: 
     mocked_client.get.return_value = mocked_response
 
     with Boox(client=mocked_client, base_url=url, token=token) as boox:
-        result = boox.users.synchronize_token()
+        result = boox.users.synchronize_session_token()
 
     expected_url = url.value + "/api/1/users/syncToken"
     mocked_client.get.assert_called_once_with(expected_url)
     mocked_response.json.assert_called_once()
-    assert isinstance(result, SyncTokenResponse)
+    assert isinstance(result, SyncSessionTokenResponse)
     assert result.data == DataSession.model_validate(data)
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_2(mocked_client: mock.Mock, url: BooxUrl):
+def test_sync_session_token_raises_token_missing_error(mocked_client: mock.Mock, url: BooxUrl):
     with (
         Boox(client=mocked_client, base_url=url) as boox,
         pytest.raises(TokenMissingError, match="Bearer token is required to call this method"),
     ):
-        boox.users.synchronize_token()
+        boox.users.synchronize_session_token()
 
 
 @e2e
@@ -171,11 +171,11 @@ def test_fetch_session_token_e2e(config: E2EConfig):
 
 
 @e2e
-def test_synchronize_token_e2e(config: E2EConfig):
+def test_synchronize_session_token_e2e(config: E2EConfig):
     if not config.token:
-        pytest.skip("Token was either not obtainer or not set")
+        pytest.skip("Token was either not obtained or not set")
 
     with Boox(base_url=config.domain, token=config.token) as boox:
-        response = boox.users.synchronize_token()
+        response = boox.users.synchronize_session_token()
 
-    assert response.token_expired_at
+    assert response.data.expires

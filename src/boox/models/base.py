@@ -1,4 +1,7 @@
-from pydantic import BaseModel
+import datetime
+from typing import ClassVar
+
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class BaseResponse[T](BaseModel):
@@ -19,3 +22,11 @@ class BaseResponse[T](BaseModel):
 
     def __repr__(self) -> str:
         return f"{type(self).__name__}({self!s})"
+
+
+class BaseSyncResponse[T](BaseResponse[T]):
+    """A base response for responses that rely on token."""
+
+    model_config: ClassVar[ConfigDict] = ConfigDict(serialize_by_alias=True)
+
+    token_expired_at: datetime.datetime = Field(alias="tokenExpiredAt")

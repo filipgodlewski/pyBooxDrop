@@ -15,7 +15,7 @@ from pydantic import (
 )
 from pydantic_core import PydanticCustomError
 
-from boox.models.base import BaseResponse
+from boox.models.base import BaseResponse, BaseSyncResponse
 
 
 def soft_validate_email(value: str) -> bool:
@@ -108,9 +108,5 @@ class DataSession(BaseModel):
     session_id: SecretStr
 
 
-class SyncTokenResponse(BaseResponse[DataSession]):
-    """A response, with information about token and session expiration."""
-
-    model_config: ClassVar[ConfigDict] = ConfigDict(serialize_by_alias=True)
-
-    token_expired_at: datetime.datetime = Field(alias="tokenExpiredAt")
+class SyncSessionTokenResponse(BaseSyncResponse[DataSession]):
+    """A response, with information about expiry dates, with an emphasis on the session."""

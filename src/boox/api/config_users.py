@@ -20,7 +20,7 @@ class ConfigUsersApi(Api):
         That is also the reason why this call pre-validates the client header.
 
         Returns:
-            SyncTokenResponse: The validated response containing information about token expiry date, and session metadata.
+            SyncTokenResponse: The validated response containing information about token expiry date.
         """
         response = self._get(endpoint="/api/1/configUsers/one")
         return SyncTokenResponse.model_validate(response.json())

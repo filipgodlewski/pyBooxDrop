@@ -23,12 +23,23 @@ or plug it into your own tools and scripts.
 - HTTP client agnostic – plug in your own via simple `HttpClient` interface
 - Open-source, MIT-licensed, built with readability in mind
 
+### Supported endpoints
+
 <details>
 
-  <summary>Supported endpoints</summary>
+  <summary>configUsers/ endpoints</summary>
 
 ```http
-GET /api/1/users/one
+GET /api/1/configUsers/one
+```
+
+</details>
+
+<details>
+
+  <summary>users/ endpoints</summary>
+
+```http
 GET /api/1/users/syncToken
 POST /api/1/users/sendVerifyCode
 POST /api/1/users/signupByPhoneOrEmail

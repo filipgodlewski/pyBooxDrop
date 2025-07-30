@@ -8,6 +8,7 @@ import pytest
 from pydantic import SecretStr, ValidationError
 from pytest_mock import MockerFixture
 
+from boox.api.config_users import ConfigUsersApi
 from boox.api.users import UsersApi
 from boox.core import Boox
 from boox.models.enums import BooxUrl
@@ -176,6 +177,11 @@ def test_boox_client_is_assigned_properly(mocked_client: mock.Mock):
 def test_boox_users_api_is_initialized(mocked_client: mock.Mock):
     boox = Boox(client=mocked_client)
     assert isinstance(boox.users, UsersApi)
+
+
+def test_boox_config_users_api_is_initiated(mocked_client: mock.Mock):
+    boox = Boox(client=mocked_client)
+    assert isinstance(boox.config_users, ConfigUsersApi)
 
 
 def test_boox_sets_default_headers(mocked_client: mock.Mock):

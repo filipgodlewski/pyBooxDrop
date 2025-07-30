@@ -28,9 +28,10 @@ or plug it into your own tools and scripts.
   <summary>Supported endpoints</summary>
 
 ```http
+GET /api/1/users/one
+GET /api/1/users/syncToken
 POST /api/1/users/sendVerifyCode
 POST /api/1/users/signupByPhoneOrEmail
-GET /api/1/users/syncToken
 ```
 
 </details>

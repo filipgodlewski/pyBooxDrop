@@ -22,7 +22,7 @@ def test_sync_token_raises_token_missing_error(mocked_client: mock.Mock, url: Bo
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_users_api_sync_token_integration(mocker: MockerFixture, mocked_client: mock.Mock, url: BooxUrl):
+def test_config_users_api_sync_token_integration(mocker: MockerFixture, mocked_client: mock.Mock, url: BooxUrl):
     token = str(uuid1())
     mocked_response = mocker.Mock()
     mocked_response.json = mocker.Mock(

@@ -10,6 +10,7 @@ from boox.models.users import (
     FetchTokenRequest,
     SendVerifyCodeRequest,
     SyncSessionTokenResponse,
+    SyncTokenResponse,
     soft_validate_email,
 )
 
@@ -85,6 +86,18 @@ def test_token_is_public_in_json_dump():
 
 
 def test_sync_token_response_parses_nested_data_correctly():
+    token_expiry = datetime.datetime.now(tz=datetime.UTC).replace(microsecond=0) + datetime.timedelta(days=180)
+    data = SyncTokenResponse.model_validate({
+        "data": None,
+        "message": "SUCCESS",
+        "result_code": 0,
+        "tokenExpiredAt": int(token_expiry.timestamp()),
+    })
+    assert not data.data
+    assert data.token_expired_at == token_expiry
+
+
+def test_sync_session_token_response_parses_nested_data_correctly():
     session_expiry = datetime.datetime.now(tz=datetime.UTC).replace(microsecond=0)
     token_expiry = datetime.datetime.now(tz=datetime.UTC).replace(microsecond=0) + datetime.timedelta(days=180)
     data = SyncSessionTokenResponse.model_validate({

@@ -4,6 +4,7 @@ from typing import cast
 
 from pydantic import ConfigDict, SecretStr, TypeAdapter, validate_call
 
+from boox.api.config_users import ConfigUsersApi
 from boox.api.users import UsersApi
 from boox.client import BaseHttpClient
 from boox.models.enums import BooxUrl
@@ -54,6 +55,7 @@ class Boox:
             self.client.headers.update({"Authorization": f"Bearer {token}"})
 
         self.users = UsersApi(self)
+        self.config_users = ConfigUsersApi(self)
 
     def __enter__(self):
         return self

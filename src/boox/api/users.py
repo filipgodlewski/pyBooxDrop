@@ -7,7 +7,6 @@ from boox.models.users import (
     SendVerifyCodeRequest,
     SendVerifyResponse,
     SyncSessionTokenResponse,
-    SyncTokenResponse,
 )
 
 
@@ -57,22 +56,6 @@ class UsersApi(Api):
         """
         response = self._post(endpoint="/api/1/users/signupByPhoneOrEmail", json=payload.model_dump(exclude_unset=True))
         return FetchTokenResponse.model_validate(response.json())
-
-    @requires_token
-    def synchronize_token(self) -> SyncTokenResponse:
-        """A call to check token authenticity and validity.
-
-        A typical scenario for this route is to use it before any action to prevent a server error.
-
-        This call **requires** the token to be passed as an Authorization header, e.g.:
-            >>> {"Authorization": "Bearer xyz123abc"}
-        That is also the reason why this call pre-validates the client header.
-
-        Returns:
-            SyncTokenResponse: The validated response containing information about token expiry date, and session metadata.
-        """
-        response = self._get(endpoint="/api/1/users/one")
-        return SyncTokenResponse.model_validate(response.json())
 
     @requires_token
     def synchronize_session_token(self) -> SyncSessionTokenResponse:

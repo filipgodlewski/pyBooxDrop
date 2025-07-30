@@ -101,10 +101,6 @@ class FetchTokenResponse(BaseResponse[DataToken]):
     """A response, with token under data key."""
 
 
-class SyncTokenResponse(BaseSyncResponse[None]):
-    """A response, wtih information aobut token expiry date."""
-
-
 class DataSession(BaseModel):
     channels: tuple[Any, ...]
     cookie_name: str

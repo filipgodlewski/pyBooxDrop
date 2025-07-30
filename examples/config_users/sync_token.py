@@ -8,14 +8,14 @@ import datetime
 from typing import cast
 
 from boox.core import Boox
+from boox.models.config_users import SyncTokenResponse
 from boox.models.enums import BooxUrl
-from boox.models.users import SyncTokenResponse
 
 TOKEN = cast(str, ...)  # Just to make this example easier
 
 
 with Boox(base_url=BooxUrl.EUR, token=TOKEN) as boox:
-    response: SyncTokenResponse = boox.users.synchronize_token()
+    response: SyncTokenResponse = boox.config_users.synchronize_token()
 
 # Although the original response has tokenExpiredAt key, it is aliased for more pythonic use
 

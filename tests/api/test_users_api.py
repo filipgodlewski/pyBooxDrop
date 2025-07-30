@@ -18,7 +18,6 @@ from boox.models.users import (
     SendVerifyCodeRequest,
     SendVerifyResponse,
     SyncSessionTokenResponse,
-    SyncTokenResponse,
 )
 from tests.api.utils import E2EConfig, EmailProvider
 from tests.conftest import e2e
@@ -108,26 +107,6 @@ def test_users_api_fetch_session_token_integration(mocker: MockerFixture, mocked
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_users_api_sync_token_integration(mocker: MockerFixture, mocked_client: mock.Mock, url: BooxUrl):
-    token = str(uuid1())
-    mocked_response = mocker.Mock()
-    mocked_response.json = mocker.Mock(
-        return_value={"data": None, "message": "SUCCESS", "result_code": 0, "tokenExpiredAt": 1}
-    )
-    mocked_response.raise_for_status.return_value = mocked_response
-    mocked_client.get.return_value = mocked_response
-
-    with Boox(client=mocked_client, base_url=url, token=token) as boox:
-        result = boox.users.synchronize_token()
-
-    expected_url = url.value + "/api/1/users/one"
-    mocked_client.get.assert_called_once_with(expected_url)
-    mocked_response.json.assert_called_once()
-    assert isinstance(result, SyncTokenResponse)
-    assert not result.data
-
-
-@pytest.mark.parametrize("url", list(BooxUrl))
 def test_users_api_sync_session_token_integration(mocker: MockerFixture, mocked_client: mock.Mock, url: BooxUrl):
     token = str(uuid1())
     mocked_response = mocker.Mock()
@@ -151,15 +130,6 @@ def test_users_api_sync_session_token_integration(mocker: MockerFixture, mocked_
     mocked_response.json.assert_called_once()
     assert isinstance(result, SyncSessionTokenResponse)
     assert result.data == DataSession.model_validate(data)
-
-
-@pytest.mark.parametrize("url", list(BooxUrl))
-def test_sync_token_raises_token_missing_error(mocked_client: mock.Mock, url: BooxUrl):
-    with (
-        Boox(client=mocked_client, base_url=url) as boox,
-        pytest.raises(TokenMissingError, match="Bearer token is required to call this method"),
-    ):
-        boox.users.synchronize_token()
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
@@ -209,15 +179,3 @@ def test_synchronize_session_token_e2e(config: E2EConfig):
         response = boox.users.synchronize_session_token()
 
     assert response.data.expires
-
-
-@e2e
-def test_synchronize_token_e2e(config: E2EConfig):
-    if not config.token:
-        pytest.skip("Token was either not obtainer or not set")
-
-    with Boox(base_url=config.domain, token=config.token) as boox:
-        response = boox.users.synchronize_token()
-
-    assert not response.data
-    assert response.token_expired_at

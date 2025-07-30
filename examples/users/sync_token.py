@@ -9,13 +9,13 @@ from typing import cast
 
 from boox.core import Boox
 from boox.models.enums import BooxUrl
-from boox.models.users import SyncTokenResponse
+from boox.models.users import SyncSessionTokenResponse
 
 TOKEN = cast(str, ...)  # Just to make this example easier
 
 
 with Boox(base_url=BooxUrl.EUR, token=TOKEN) as boox:
-    response: SyncTokenResponse = boox.users.synchronize_token()
+    response: SyncSessionTokenResponse = boox.users.synchronize_session_token()
 
 # Although the original response has tokenExpiredAt key, it is aliased for more pythonic use
 

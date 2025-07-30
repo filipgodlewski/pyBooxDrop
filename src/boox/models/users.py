@@ -108,8 +108,8 @@ class DataSession(BaseModel):
     session_id: SecretStr
 
 
-class SyncTokenResponse(BaseResponse[DataSession]):
-    """A response, with information about token and session expiration."""
+class SyncSessionTokenResponse(BaseResponse[DataSession]):
+    """A response, with information about expiry dates, with an emphasis on the session."""
 
     model_config: ClassVar[ConfigDict] = ConfigDict(serialize_by_alias=True)
 

@@ -173,7 +173,7 @@ def test_fetch_session_token_e2e(config: E2EConfig):
 @e2e
 def test_synchronize_session_token_e2e(config: E2EConfig):
     if not config.token:
-        pytest.skip("Token was either not obtainer or not set")
+        pytest.skip("Token was either not obtained or not set")
 
     with Boox(base_url=config.domain, token=config.token) as boox:
         response = boox.users.synchronize_session_token()

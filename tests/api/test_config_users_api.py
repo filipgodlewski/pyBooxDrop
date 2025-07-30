@@ -44,7 +44,7 @@ def test_config_users_api_sync_token_integration(mocker: MockerFixture, mocked_c
 @e2e
 def test_synchronize_token_e2e(config: E2EConfig):
     if not config.token:
-        pytest.skip("Token was either not obtainer or not set")
+        pytest.skip("Token was either not obtained or not set")
 
     with Boox(base_url=config.domain, token=config.token) as boox:
         response = boox.config_users.synchronize_token()

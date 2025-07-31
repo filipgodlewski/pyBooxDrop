@@ -7,6 +7,7 @@ from boox.models.users import (
     SendVerifyCodeRequest,
     SendVerifyResponse,
     SyncSessionTokenResponse,
+    UserInfoResponse,
 )
 
 
@@ -73,3 +74,8 @@ class UsersApi(Api):
         """
         response = self._get(endpoint="/api/1/users/syncToken")
         return SyncSessionTokenResponse.model_validate(response.json())
+
+    @requires_token
+    def get_user_info(self) -> UserInfoResponse:
+        response = self._get(endpoint="/api/1/users/me")
+        return UserInfoResponse.model_validate(response.json())

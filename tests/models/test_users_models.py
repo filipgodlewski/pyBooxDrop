@@ -2,6 +2,7 @@ import datetime
 import re
 
 import pytest
+from faker import Faker
 from pydantic import ValidationError
 
 from boox.models.users import (
@@ -84,18 +85,18 @@ def test_token_is_public_in_json_dump():
     assert re.compile(r'{"token":"xyz123"}').fullmatch(dumped)
 
 
-def test_sync_session_token_response_parses_nested_data_correctly():
-    session_expiry = datetime.datetime.now(tz=datetime.UTC).replace(microsecond=0)
-    token_expiry = datetime.datetime.now(tz=datetime.UTC).replace(microsecond=0) + datetime.timedelta(days=180)
+def test_sync_session_token_response_parses_nested_data_correctly(faker: Faker):
+    session_expiry = faker.future_datetime(tzinfo=datetime.UTC).replace(microsecond=0)
+    token_expiry = faker.future_datetime(tzinfo=datetime.UTC).replace(microsecond=0)
     data = SyncSessionTokenResponse.model_validate({
         "data": {
             "channels": (),
-            "cookie_name": "foo",
+            "cookie_name": faker.pystr(),
             "expires": session_expiry.strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "session_id": "bar",
+            "session_id": faker.uuid4(),
         },
-        "message": "SUCCESS",
-        "result_code": 0,
+        "message": faker.pystr(),
+        "result_code": faker.random_digit(),
         "tokenExpiredAt": int(token_expiry.timestamp()),
     })
     assert isinstance(data.data, DataSession)

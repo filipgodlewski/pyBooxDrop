@@ -1,13 +1,10 @@
 from collections.abc import Iterator
 from contextlib import suppress
-from unittest import mock
 
 import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
 from polyfactory.pytest_plugin import register_fixture
 
-from boox.core import Boox
-from boox.models.enums import BooxUrl
 from boox.models.users import FetchTokenResponse, SendVerifyResponse, SyncSessionTokenResponse, UserInfoResponse
 from tests.api.utils import E2EConfig, EmailProvider
 
@@ -46,9 +43,3 @@ class FakeSyncSessionTokenResponse(ModelFactory[SyncSessionTokenResponse]):
 @register_fixture
 class FakeUserInfoResponse(ModelFactory[UserInfoResponse]):
     __check_model__ = True
-
-
-@pytest.fixture
-def mocked_boox(mocked_client: mock.Mock) -> Iterator[Boox]:
-    with Boox(client=mocked_client, base_url=BooxUrl.EUR) as boox:
-        yield boox

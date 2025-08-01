@@ -133,12 +133,9 @@ def test_users_api_sync_session_token_integration(mocker: MockerFixture, mocked_
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_sync_session_token_raises_token_missing_error(mocked_client: mock.Mock, url: BooxUrl):
-    with (
-        Boox(client=mocked_client, base_url=url) as boox,
-        pytest.raises(TokenMissingError, match="Bearer token is required to call this method"),
-    ):
-        boox.users.synchronize_session_token()
+def test_sync_session_token_raises_token_missing_error(mocked_boox: Boox):
+    with pytest.raises(TokenMissingError, match="Bearer token is required to call this method"):
+        mocked_boox.users.synchronize_session_token()
 
 
 @e2e

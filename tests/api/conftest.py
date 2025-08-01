@@ -1,5 +1,6 @@
 from collections.abc import Iterator
 from contextlib import suppress
+from unittest import mock
 
 import pytest
 
@@ -25,3 +26,9 @@ def email(config: E2EConfig) -> Iterator[EmailProvider]:
     yield provider
     with suppress(ValueError):
         provider.cleanup_inbox()
+
+
+@pytest.fixture
+def mocked_boox(mocked_client: mock.Mock) -> Iterator[Boox]:
+    with Boox(client=mocked_client, base_url=BooxUrl.EUR) as boox:
+        yield boox

@@ -1,6 +1,6 @@
 [project]
 name = "pybooxdrop"
-version = "0.4.0"
+version = "0.5.0"
 description = "A friendly Python wrapper for the BOOXDrop API — unofficial, but built with care."
 readme = "README.md"
 license = "MIT"

@@ -1,10 +1,10 @@
-from unittest import mock
+from typing import TYPE_CHECKING
 
-from boox.core import Boox
+if TYPE_CHECKING:
+    from boox.core import Boox
 
 # pyright: reportPrivateUsage=false
 
 
-def test_config_users_api_has_access_to_boox(mocked_client: mock.Mock):
-    boox = Boox(client=mocked_client)
-    assert boox.config_users._session is boox
+def test_config_users_api_has_access_to_boox(mocked_boox: "Boox"):
+    assert mocked_boox.config_users._session is mocked_boox

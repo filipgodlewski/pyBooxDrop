@@ -24,6 +24,6 @@ _login_type: str = response.data.login_type
 # nickname - your custom name for the account
 _nickname: str | None = response.data.nickname
 
-# storage_usd and storage_limit
+# storage_used and storage_limit
 _storage_used: int = response.data.storage_used
 _storage_limit: int = response.data.storage_limit

@@ -9,7 +9,7 @@ from boox.api.users import UsersApi
 from boox.core import Boox
 from boox.models.enums import BooxUrl
 from boox.models.users import DataSession, SyncSessionTokenResponse
-from tests.api.conftest import FakeSyncSessionTokenResponse
+from tests.api.users.conftest import FakeSyncSessionTokenResponse
 from tests.api.utils import E2EConfig
 from tests.conftest import e2e
 
@@ -18,10 +18,10 @@ from tests.conftest import e2e
 
 def test_sync_session_token_calls_get_and_parses_response(
     mocker: MockerFixture,
-    sync_session_token_response: FakeSyncSessionTokenResponse,
+    fake_sync_session_token_response: FakeSyncSessionTokenResponse,
 ):
     mocked_response = mocker.Mock()
-    mocked_response.json.return_value = sync_session_token_response.build().model_dump()
+    mocked_response.json.return_value = fake_sync_session_token_response.build().model_dump()
     api = UsersApi(session=mocker.Mock())
     api._get = mocker.Mock(return_value=mocked_response)
 
@@ -36,12 +36,12 @@ def test_sync_session_token_calls_get_and_parses_response(
 def test_users_api_sync_session_token_integration(
     mocker: MockerFixture,
     faker: Faker,
-    sync_session_token_response: FakeSyncSessionTokenResponse,
+    fake_sync_session_token_response: FakeSyncSessionTokenResponse,
     mocked_client: mock.Mock,
     url: BooxUrl,
 ):
     mocked_response = mocker.Mock()
-    mocked_response.json.return_value = sync_session_token_response.build().model_dump()
+    mocked_response.json.return_value = fake_sync_session_token_response.build().model_dump()
     mocked_response.raise_for_status.return_value = mocked_response
     mocked_client.get.return_value = mocked_response
 

@@ -9,7 +9,7 @@ from boox.api.users import UsersApi
 from boox.core import Boox
 from boox.models.enums import BooxUrl
 from boox.models.users import SendVerifyCodeRequest, SendVerifyResponse
-from tests.api.conftest import FakeSendVerifyResponse
+from tests.api.users.conftest import FakeSendVerifyResponse
 from tests.api.utils import E2EConfig, EmailProvider
 from tests.conftest import e2e
 
@@ -19,10 +19,10 @@ from tests.conftest import e2e
 def test_send_verification_code_calls_post_and_parses_response(
     mocker: MockerFixture,
     faker: Faker,
-    send_verify_response: FakeSendVerifyResponse,
+    fake_send_verify_response: FakeSendVerifyResponse,
 ):
     mocked_response = mocker.Mock()
-    mocked_response.json.return_value = send_verify_response.build().model_dump()
+    mocked_response.json.return_value = fake_send_verify_response.build().model_dump()
     api = UsersApi(session=mocker.Mock())
     api._post = mocker.Mock(return_value=mocked_response)
 
@@ -37,12 +37,12 @@ def test_send_verification_code_calls_post_and_parses_response(
 def test_users_api_send_verification_code_integration(
     mocker: MockerFixture,
     faker: Faker,
-    send_verify_response: FakeSendVerifyResponse,
+    fake_send_verify_response: FakeSendVerifyResponse,
     mocked_client: mock.Mock,
     url: BooxUrl,
 ):
     mocked_response = mocker.Mock()
-    mocked_response.json.return_value = send_verify_response.build().model_dump()
+    mocked_response.json.return_value = fake_send_verify_response.build().model_dump()
     mocked_response.raise_for_status.return_value = mocked_response
     mocked_client.post.return_value = mocked_response
 

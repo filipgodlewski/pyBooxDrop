@@ -131,13 +131,13 @@ class DataUser(BaseModel):
     huawei_id: Any | None
     id: int
     login_type: Literal["phone", "email"]
-    nickname: str
+    nickname: str | None
     oauth_id: Any | None
     otp_auth_url: Any | None
     otp_enabled: bool
     otp_verified: bool
     parent: Any | None
-    phone: str
+    phone: str | None
     role_value: int = Field(alias="roleValue")
     sex: Any | None
     storage_limit: int

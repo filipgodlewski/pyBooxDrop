@@ -1,7 +1,7 @@
 import datetime
 import re
 from contextlib import suppress
-from typing import Annotated, Any, ClassVar, Self
+from typing import Annotated, Any, ClassVar, Literal, Self
 
 from pydantic import (
     BaseModel,
@@ -130,7 +130,7 @@ class DataUser(BaseModel):
     google_id: Any | None
     huawei_id: Any | None
     id: int
-    login_type: str
+    login_type: Literal["phone", "email"]
     nickname: str
     oauth_id: Any | None
     otp_auth_url: Any | None

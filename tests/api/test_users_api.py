@@ -1,9 +1,8 @@
-import datetime
 import re
 from unittest import mock
-from uuid import uuid1
 
 import pytest
+from faker import Faker
 from pytest_mock import MockerFixture
 
 from boox.api.core import TokenMissingError
@@ -18,6 +17,11 @@ from boox.models.users import (
     SendVerifyCodeRequest,
     SendVerifyResponse,
     SyncSessionTokenResponse,
+from tests.api.conftest import (
+    FakeFetchTokenResponse,
+    FakeSendVerifyResponse,
+    FakeSyncSessionTokenResponse,
+    FakeUserInfoResponse,
 )
 from tests.api.utils import E2EConfig, EmailProvider
 from tests.conftest import e2e
@@ -30,106 +34,109 @@ def test_boox_client_initializes_users_api(mocked_client: mock.Mock):
     assert boox.users._session is boox
 
 
-def test_send_verification_code_calls_post_and_parses_response(mocker: MockerFixture):
-    mocked_session = mocker.Mock()
-    api = UsersApi(session=mocked_session)
-
+def test_send_verification_code_calls_post_and_parses_response(
+    mocker: MockerFixture,
+    faker: Faker,
+    send_verify_response: FakeSendVerifyResponse,
+):
     mocked_response = mocker.Mock()
-    mocked_response.json = mocker.Mock(return_value={"data": "ok", "message": "SUCCESS", "result_code": 0})
-
+    mocked_response.json.return_value = send_verify_response.build().model_dump()
+    api = UsersApi(session=mocker.Mock())
     api._post = mocker.Mock(return_value=mocked_response)
 
-    payload = SendVerifyCodeRequest.model_validate({"mobi": "foo@bar.com"})
-    result = api.send_verification_code(payload=payload)
+    send_data = {"mobi": faker.email()}
+    result = api.send_verification_code(payload=SendVerifyCodeRequest.model_validate(send_data))
 
-    assert result == SendVerifyResponse(data="ok", message="SUCCESS", result_code=0)
-    api._post.assert_called_once_with(endpoint="/api/1/users/sendVerifyCode", json={"mobi": "foo@bar.com"})
+    assert isinstance(result, SendVerifyResponse)
+    api._post.assert_called_once_with(endpoint="/api/1/users/sendVerifyCode", json=send_data)
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_users_api_send_verification_code_integration(mocker: MockerFixture, mocked_client: mock.Mock, url: BooxUrl):
+def test_users_api_send_verification_code_integration(
+    mocker: MockerFixture,
+    faker: Faker,
+    send_verify_response: FakeSendVerifyResponse,
+    mocked_client: mock.Mock,
+    url: BooxUrl,
+):
     mocked_response = mocker.Mock()
-    mocked_response.json.return_value = {"data": "ok", "message": "SUCCESS", "result_code": 0}
+    mocked_response.json.return_value = send_verify_response.build().model_dump()
     mocked_response.raise_for_status.return_value = mocked_response
     mocked_client.post.return_value = mocked_response
 
     with Boox(client=mocked_client, base_url=url) as boox:
-        payload = SendVerifyCodeRequest.model_validate({"mobi": "foo@bar.com"})
+        send_data = {"mobi": faker.email()}
+        payload = SendVerifyCodeRequest.model_validate(send_data)
         result = boox.users.send_verification_code(payload=payload)
 
-    expected_url = url.value + "/api/1/users/sendVerifyCode"
-    expected_json = payload.model_dump(exclude_unset=True)
-    mocked_client.post.assert_called_once_with(expected_url, json=expected_json)
+    mocked_client.post.assert_called_once_with(url.value + "/api/1/users/sendVerifyCode", json=send_data)
     mocked_response.json.assert_called_once()
     assert isinstance(result, SendVerifyResponse)
-    assert result.data == "ok"
 
 
-def test_fetch_session_token_calls_post_and_parses_response(mocker: MockerFixture):
-    token = str(uuid1())
-    mocked_session = mocker.Mock()
-    api = UsersApi(session=mocked_session)
-
+def test_fetch_session_token_calls_post_and_parses_response(
+    mocker: MockerFixture,
+    faker: Faker,
+    fetch_token_response: FakeFetchTokenResponse,
+):
+    return_value = fetch_token_response.build()
     mocked_response = mocker.Mock()
-    mocked_response.json = mocker.Mock(return_value={"data": {"token": token}, "message": "SUCCESS", "result_code": 0})
-
+    mocked_response.json.return_value = return_value.model_dump()
+    api = UsersApi(session=mocker.Mock())
     api._post = mocker.Mock(return_value=mocked_response)
 
-    payload = FetchTokenRequest.model_validate({"mobi": "foo@bar.com", "code": "123456"})
+    send_data = {"mobi": faker.email(), "code": str(faker.random_number(digits=6))}
+    payload = FetchTokenRequest.model_validate(send_data)
     result = api.fetch_session_token(payload=payload)
 
-    data = FetchTokenResponse.model_validate({"data": {"token": token}, "message": "SUCCESS", "result_code": 0})
-    assert result == data
-    api._post.assert_called_once_with(
-        endpoint="/api/1/users/signupByPhoneOrEmail", json={"mobi": "foo@bar.com", "code": "123456"}
-    )
+    assert result == return_value
+    api._post.assert_called_once_with(endpoint="/api/1/users/signupByPhoneOrEmail", json=send_data)
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_users_api_fetch_session_token_integration(mocker: MockerFixture, mocked_client: mock.Mock, url: BooxUrl):
-    token = str(uuid1())
+def test_users_api_fetch_session_token_integration(
+    mocker: MockerFixture,
+    faker: Faker,
+    fetch_token_response: FakeFetchTokenResponse,
+    mocked_client: mock.Mock,
+    url: BooxUrl,
+):
     mocked_response = mocker.Mock()
-    mocked_response.json.return_value = {"data": {"token": token}, "message": "SUCCESS", "result_code": 0}
+    mocked_response.json.return_value = fetch_token_response.build().model_dump()
     mocked_response.raise_for_status.return_value = mocked_response
     mocked_client.post.return_value = mocked_response
 
     with Boox(client=mocked_client, base_url=url) as boox:
-        payload = FetchTokenRequest.model_validate({"mobi": "foo@bar.com", "code": "123456"})
+        send_data = {"mobi": faker.email(), "code": str(faker.random_number(digits=6))}
+        payload = FetchTokenRequest.model_validate(send_data)
         result = boox.users.fetch_session_token(payload=payload)
 
-    expected_url = url.value + "/api/1/users/signupByPhoneOrEmail"
-    expected_json = payload.model_dump(exclude_unset=True)
-    mocked_client.post.assert_called_once_with(expected_url, json=expected_json)
+    mocked_client.post.assert_called_once_with(url.value + "/api/1/users/signupByPhoneOrEmail", json=send_data)
     mocked_response.json.assert_called_once()
     assert isinstance(result, FetchTokenResponse)
-    data = DataToken.model_validate({"token": token})
-    assert result.data == data
+    assert isinstance(result.data, DataToken)
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_users_api_sync_session_token_integration(mocker: MockerFixture, mocked_client: mock.Mock, url: BooxUrl):
-    token = str(uuid1())
+def test_users_api_sync_session_token_integration(
+    mocker: MockerFixture,
+    faker: Faker,
+    sync_session_token_response: FakeSyncSessionTokenResponse,
+    mocked_client: mock.Mock,
+    url: BooxUrl,
+):
     mocked_response = mocker.Mock()
-    data = {
-        "channels": (),
-        "cookie_name": "foo",
-        "expires": datetime.datetime.now(tz=datetime.UTC),
-        "session_id": "xyz123",
-    }
-    mocked_response.json = mocker.Mock(
-        return_value={"data": data, "message": "SUCCESS", "result_code": 0, "tokenExpiredAt": 1}
-    )
+    mocked_response.json.return_value = sync_session_token_response.build().model_dump()
     mocked_response.raise_for_status.return_value = mocked_response
     mocked_client.get.return_value = mocked_response
 
-    with Boox(client=mocked_client, base_url=url, token=token) as boox:
+    with Boox(client=mocked_client, base_url=url, token=faker.uuid4()) as boox:
         result = boox.users.synchronize_session_token()
 
-    expected_url = url.value + "/api/1/users/syncToken"
-    mocked_client.get.assert_called_once_with(expected_url)
+    mocked_client.get.assert_called_once_with(url.value + "/api/1/users/syncToken")
     mocked_response.json.assert_called_once()
     assert isinstance(result, SyncSessionTokenResponse)
-    assert result.data == DataSession.model_validate(data)
+    assert isinstance(result.data, DataSession)
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))

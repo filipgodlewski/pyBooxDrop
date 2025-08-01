@@ -1,13 +1,14 @@
 from unittest import mock
-from uuid import uuid1
 
 import pytest
+from faker import Faker
 from pytest_mock import MockerFixture
 
 from boox.api.core import TokenMissingError
 from boox.core import Boox
 from boox.models.config_users import SyncTokenResponse
 from boox.models.enums import BooxUrl
+from tests.api.conftest import FakeSyncTokenResponse
 from tests.api.utils import E2EConfig
 from tests.conftest import e2e
 
@@ -22,12 +23,18 @@ def test_sync_token_raises_token_missing_error(mocked_client: mock.Mock, url: Bo
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_config_users_api_sync_token_integration(mocker: MockerFixture, mocked_client: mock.Mock, url: BooxUrl):
-    token = str(uuid1())
+def test_config_users_api_sync_token_integration(
+    mocker: MockerFixture,
+    faker: Faker,
+    sync_token_response: FakeSyncTokenResponse,
+    mocked_client: mock.Mock,
+    url: BooxUrl,
+):
+    token = faker.uuid4()
+
+    return_value = sync_token_response.build()
     mocked_response = mocker.Mock()
-    mocked_response.json = mocker.Mock(
-        return_value={"data": None, "message": "SUCCESS", "result_code": 0, "tokenExpiredAt": 1}
-    )
+    mocked_response.json = mocker.Mock(return_value=return_value.model_dump())
     mocked_response.raise_for_status.return_value = mocked_response
     mocked_client.get.return_value = mocked_response
 

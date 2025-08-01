@@ -3,7 +3,13 @@ from contextlib import suppress
 from unittest import mock
 
 import pytest
+from polyfactory.factories.pydantic_factory import ModelFactory
+from polyfactory.pytest_plugin import register_fixture
 
+from boox.core import Boox
+from boox.models.config_users import SyncTokenResponse
+from boox.models.enums import BooxUrl
+from boox.models.users import FetchTokenResponse, SendVerifyResponse, SyncSessionTokenResponse, UserInfoResponse
 from tests.api.utils import E2EConfig, EmailProvider
 
 
@@ -26,6 +32,31 @@ def email(config: E2EConfig) -> Iterator[EmailProvider]:
     yield provider
     with suppress(ValueError):
         provider.cleanup_inbox()
+
+
+@register_fixture(name="send_verify_response")
+class FakeSendVerifyResponse(ModelFactory[SendVerifyResponse]):
+    __check_model__ = True  # TODO: Remove when `polyfactory` lib is updated to v3
+
+
+@register_fixture(name="fetch_token_response")
+class FakeFetchTokenResponse(ModelFactory[FetchTokenResponse]):
+    __check_model__ = True
+
+
+@register_fixture(name="sync_token_response")
+class FakeSyncTokenResponse(ModelFactory[SyncTokenResponse]):
+    __check_model__ = True
+
+
+@register_fixture(name="sync_session_token_response")
+class FakeSyncSessionTokenResponse(ModelFactory[SyncSessionTokenResponse]):
+    __check_model__ = True
+
+
+@register_fixture(name="user_info_response")
+class FakeUserInfoResponse(ModelFactory[UserInfoResponse]):
+    __check_model__ = True
 
 
 @pytest.fixture

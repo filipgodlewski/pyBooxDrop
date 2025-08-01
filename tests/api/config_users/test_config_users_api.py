@@ -5,6 +5,6 @@ from boox.core import Boox
 # pyright: reportPrivateUsage=false
 
 
-def test_users_api_has_access_to_boox(mocked_client: mock.Mock):
+def test_config_users_api_has_access_to_boox(mocked_client: mock.Mock):
     boox = Boox(client=mocked_client)
-    assert boox.users._session is boox
+    assert boox.config_users._session is boox

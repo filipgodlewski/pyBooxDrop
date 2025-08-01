@@ -8,7 +8,7 @@ from boox.api.core import TokenMissingError
 from boox.core import Boox
 from boox.models.config_users import SyncTokenResponse
 from boox.models.enums import BooxUrl
-from tests.api.conftest import FakeSyncTokenResponse
+from tests.api.config_users.conftest import FakeSyncTokenResponse
 from tests.api.utils import E2EConfig
 from tests.conftest import e2e
 

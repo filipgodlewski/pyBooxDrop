@@ -5,7 +5,7 @@ from boox.models.base import BaseResponse, BaseSyncResponse
 
 
 def test_base_response_str_format():
-    response = BaseResponse[None](data=None, message="foo", result_code=123)
+    response = BaseResponse(data=None, message="foo", result_code=123)
     assert str(response) == "<123: foo>"
 
 

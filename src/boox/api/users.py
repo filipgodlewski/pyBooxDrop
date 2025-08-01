@@ -77,5 +77,16 @@ class UsersApi(Api):
 
     @requires_token
     def get_user_info(self) -> UserInfoResponse:
+        """A call to get account information.
+
+        A typical situation when this endpoint is being used is to check whether some data changes are reflected on the server.
+
+        This call **requires** the token to be passed as an Authorization header, e.g.:
+            >>> {"Authorization": "Bearer xyz123abc"}
+        That is also the reason why this call pre-validates the client header.
+
+        Returns:
+            UserInfoResponse: The validated response containing account information.
+        """
         response = self._get(endpoint="/api/1/users/me")
         return UserInfoResponse.model_validate(response.json())

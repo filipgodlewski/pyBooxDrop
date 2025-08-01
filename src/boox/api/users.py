@@ -7,6 +7,7 @@ from boox.models.users import (
     SendVerifyCodeRequest,
     SendVerifyResponse,
     SyncSessionTokenResponse,
+    UserInfoResponse,
 )
 
 
@@ -17,7 +18,7 @@ class UsersApi(Api):
     it is not recommended to use UsersApi as a standalone object.
     """
 
-    @validate_call()
+    @validate_call
     def send_verification_code(self, *, payload: SendVerifyCodeRequest) -> SendVerifyResponse:
         """Initial call to get the verification code.
 
@@ -39,7 +40,7 @@ class UsersApi(Api):
         response = self._post(endpoint="/api/1/users/sendVerifyCode", json=payload.model_dump(exclude_unset=True))
         return SendVerifyResponse.model_validate(response.json())
 
-    @validate_call()
+    @validate_call
     def fetch_session_token(self, *, payload: FetchTokenRequest) -> FetchTokenResponse:
         """A call to sign in using the obtained verification code.
 
@@ -73,3 +74,19 @@ class UsersApi(Api):
         """
         response = self._get(endpoint="/api/1/users/syncToken")
         return SyncSessionTokenResponse.model_validate(response.json())
+
+    @requires_token
+    def get_user_info(self) -> UserInfoResponse:
+        """A call to get account information.
+
+        A typical situation when this endpoint is being used is to check whether some data changes are reflected on the server.
+
+        This call **requires** the token to be passed as an Authorization header, e.g.:
+            >>> {"Authorization": "Bearer xyz123abc"}
+        That is also the reason why this call pre-validates the client header.
+
+        Returns:
+            UserInfoResponse: The validated response containing account information.
+        """
+        response = self._get(endpoint="/api/1/users/me")
+        return UserInfoResponse.model_validate(response.json())

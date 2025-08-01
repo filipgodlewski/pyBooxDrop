@@ -37,6 +37,7 @@ GET /api/1/configUsers/one
 
 ```http
 GET /api/1/users/syncToken
+GET /api/1/users/me
 POST /api/1/users/sendVerifyCode
 POST /api/1/users/signupByPhoneOrEmail
 ```

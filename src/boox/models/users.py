@@ -1,11 +1,12 @@
 import datetime
 import re
 from contextlib import suppress
-from typing import Annotated, Any, ClassVar, Self
+from typing import Annotated, Any, ClassVar, Literal, Self
 
 from pydantic import (
     BaseModel,
     ConfigDict,
+    EmailStr,
     Field,
     PlainSerializer,
     SecretStr,
@@ -110,3 +111,45 @@ class DataSession(BaseModel):
 
 class SyncSessionTokenResponse(BaseSyncResponse[DataSession]):
     """A response, with information about expiry dates, with an emphasis on the session."""
+
+
+class DataUser(BaseModel):
+    # NOTE: If having `Any`, it means that it lacks information on type based on my internal testing.
+    # If you have some additional data, please contribute.
+    model_config: ClassVar[ConfigDict] = ConfigDict(serialize_by_alias=True)
+
+    access_token: Any | None = Field(alias="accessToken")
+    area_code: Annotated[str, StringConstraints(min_length=2, pattern=r"^\+\d+$")]
+    avatar: Any | None
+    avatar_url: Any | None = Field(alias="avatarUrl")
+    children: tuple[Any, ...]
+    consecutive_usage_days: int = Field(alias="consecutiveUsageDays")
+    device_limit: int
+    email: EmailStr
+    gift_count: int = Field(alias="giftCount")
+    google_id: Any | None
+    huawei_id: Any | None
+    id: int
+    login_type: Literal["phone", "email"]
+    nickname: str | None
+    oauth_id: Any | None
+    otp_auth_url: Any | None
+    otp_enabled: bool
+    otp_verified: bool
+    parent: Any | None
+    phone: str | None
+    role_value: int = Field(alias="roleValue")
+    sex: Any | None
+    storage_limit: int
+    storage_used: int
+    total_doc_count: int = Field(alias="totalDocCount")
+    total_usage_days: int = Field(alias="totalUsageDays")
+    uid: str
+    vip_cloud: int
+    vip_cloud_end: Any | None
+    vip_cloud_start: Any | None
+    wechat_id: Any | None
+
+
+class UserInfoResponse(BaseSyncResponse[DataUser]):
+    """A response with basic account information."""

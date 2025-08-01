@@ -37,7 +37,6 @@ Issues = "https://github.com/filipgodlewski/pybooxdrop/issues"
 [dependency-groups]
 dev = [
   "basedpyright>=1.29.4",
-  "covdefaults>=2.3.0",
   "coverage>=7.9.2",
   "polyfactory>=2.22.1",
   "pytest==8.4.1",
@@ -115,8 +114,18 @@ filterwarnings = [
 addopts = ["--strict-markers"]
 
 [tool.coverage.run]
-plugins = ["covdefaults"]
+branch = true
 source = ["boox"]
+
+[tool.coverage.report]
+show_missing = true
+skip_empty = true
+fail_under = 100
+exclude_also = [
+  '^if TYPE_CHECKING:',
+  ': \.\.\.(\s*#.*)?$', # no implementation (e.g. Protocol)
+  '^ +\.\.\.$',         # no implementation, but a newline
+]
 
 [tool.basedpyright]
 pythonVersion = "3.12"

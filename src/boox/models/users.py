@@ -152,4 +152,4 @@ class DataUser(BaseModel):
 
 
 class UserInfoResponse(BaseSyncResponse[DataUser]):
-    """A response with basic user information."""
+    """A response with basic account information."""

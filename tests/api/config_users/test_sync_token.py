@@ -32,7 +32,6 @@ def test_config_users_api_sync_token_integration(
     url: BooxUrl,
 ):
     token = faker.uuid4()
-
     return_value = fake_sync_token_response.build()
     mocked_response = mocker.Mock()
     mocked_response.json = mocker.Mock(return_value=return_value.model_dump())

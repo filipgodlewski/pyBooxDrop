@@ -3,17 +3,19 @@
 Quite a useful method if you'd like to see whether the changes to the account were applied.
 """
 
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
 from boox.core import Boox
 from boox.models.enums import BooxUrl
-from boox.models.users import UserInfoResponse
+
+if TYPE_CHECKING:
+    from boox.models.users import UserInfoResponse
 
 TOKEN = cast(str, ...)  # Just to make this example easier
 
 
 with Boox(base_url=BooxUrl.PUSH, token=TOKEN) as boox:
-    response: UserInfoResponse = boox.users.get_user_info()
+    response: "UserInfoResponse" = boox.users.get_user_info()
 
 
 # This response contains a lot of data about your account

@@ -12,12 +12,17 @@ Mix and match however you like.
 """
 
 # Example 1: robust
+from typing import TYPE_CHECKING
+
 from boox import Boox, BooxUrl
-from boox.models.users import SendVerifyCodeRequest, SendVerifyResponse
+from boox.models.users import SendVerifyCodeRequest
+
+if TYPE_CHECKING:
+    from boox.models.users import SendVerifyResponse
 
 with Boox(base_url=BooxUrl.EUR) as boox:
     payload = SendVerifyCodeRequest.model_validate({"mobi": "foo@bar.com"})
-    _: SendVerifyResponse = boox.users.send_verification_code(payload=payload)
+    _: "SendVerifyResponse" = boox.users.send_verification_code(payload=payload)
 
 # Example 2: simplified
 # pyright: reportArgumentType=false
@@ -29,5 +34,5 @@ with Boox(base_url=BooxUrl.EUR) as boox:
 
 boox = Boox(base_url="eur.boox.com")
 payload = {"mobi": "foo@bar.com"}
-_: SendVerifyResponse = boox.users.send_verification_code(payload=payload)
+_: "SendVerifyResponse" = boox.users.send_verification_code(payload=payload)
 boox.close()

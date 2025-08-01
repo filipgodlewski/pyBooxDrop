@@ -1,24 +1,29 @@
-from unittest import mock
+from typing import TYPE_CHECKING
 
 import pytest
-from faker import Faker
-from pytest_mock import MockerFixture
 
 from boox.api.core import TokenMissingError
 from boox.api.users import UsersApi
 from boox.core import Boox
 from boox.models.enums import BooxUrl
 from boox.models.users import DataUser, UserInfoResponse
-from tests.api.users.conftest import FakeUserInfoResponse
-from tests.api.utils import E2EConfig
 from tests.conftest import e2e
+
+if TYPE_CHECKING:
+    from unittest.mock import Mock
+
+    from faker import Faker
+    from pytest_mock import MockerFixture
+
+    from tests.api.users.conftest import FakeUserInfoResponse
+    from tests.api.utils import E2EConfig
 
 # pyright: reportPrivateUsage=false
 
 
 def test_get_user_info_calls_get_and_parses_response(
-    mocker: MockerFixture,
-    fake_user_info_response: FakeUserInfoResponse,
+    mocker: "MockerFixture",
+    fake_user_info_response: "FakeUserInfoResponse",
 ):
     mocked_response = mocker.Mock()
     mocked_response.json.return_value = fake_user_info_response.build().model_dump()
@@ -34,10 +39,10 @@ def test_get_user_info_calls_get_and_parses_response(
 
 @pytest.mark.parametrize("url", list(BooxUrl))
 def test_users_api_get_user_info_integration(
-    mocker: MockerFixture,
-    faker: Faker,
-    fake_user_info_response: FakeUserInfoResponse,
-    mocked_client: mock.Mock,
+    mocker: "MockerFixture",
+    faker: "Faker",
+    fake_user_info_response: "FakeUserInfoResponse",
+    mocked_client: "Mock",
     url: BooxUrl,
 ):
     mocked_response = mocker.Mock()
@@ -60,7 +65,7 @@ def test_get_user_info_raises_token_missing_error(mocked_boox: Boox):
 
 
 @e2e
-def test_get_user_info_e2e(config: E2EConfig):
+def test_get_user_info_e2e(config: "E2EConfig"):
     if not config.token:
         pytest.skip("Token was either not obtained or not set")
 

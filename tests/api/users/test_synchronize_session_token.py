@@ -1,24 +1,29 @@
-from unittest import mock
+from typing import TYPE_CHECKING
 
 import pytest
-from faker import Faker
-from pytest_mock import MockerFixture
 
 from boox.api.core import TokenMissingError
 from boox.api.users import UsersApi
 from boox.core import Boox
 from boox.models.enums import BooxUrl
 from boox.models.users import DataSession, SyncSessionTokenResponse
-from tests.api.users.conftest import FakeSyncSessionTokenResponse
 from tests.api.utils import E2EConfig
 from tests.conftest import e2e
+
+if TYPE_CHECKING:
+    from unittest.mock import Mock
+
+    from faker import Faker
+    from pytest_mock import MockerFixture
+
+    from tests.api.users.conftest import FakeSyncSessionTokenResponse
 
 # pyright: reportPrivateUsage=false
 
 
 def test_sync_session_token_calls_get_and_parses_response(
-    mocker: MockerFixture,
-    fake_sync_session_token_response: FakeSyncSessionTokenResponse,
+    mocker: "MockerFixture",
+    fake_sync_session_token_response: "FakeSyncSessionTokenResponse",
 ):
     mocked_response = mocker.Mock()
     mocked_response.json.return_value = fake_sync_session_token_response.build().model_dump()
@@ -34,10 +39,10 @@ def test_sync_session_token_calls_get_and_parses_response(
 
 @pytest.mark.parametrize("url", list(BooxUrl))
 def test_users_api_sync_session_token_integration(
-    mocker: MockerFixture,
-    faker: Faker,
-    fake_sync_session_token_response: FakeSyncSessionTokenResponse,
-    mocked_client: mock.Mock,
+    mocker: "MockerFixture",
+    faker: "Faker",
+    fake_sync_session_token_response: "FakeSyncSessionTokenResponse",
+    mocked_client: "Mock",
     url: BooxUrl,
 ):
     mocked_response = mocker.Mock()

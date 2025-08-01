@@ -1,33 +1,34 @@
-from unittest import mock
+from typing import TYPE_CHECKING
 
 import pytest
-from faker import Faker
-from pytest_mock import MockerFixture
 
 from boox.api.core import TokenMissingError
 from boox.core import Boox
 from boox.models.config_users import SyncTokenResponse
 from boox.models.enums import BooxUrl
-from tests.api.config_users.conftest import FakeSyncTokenResponse
-from tests.api.utils import E2EConfig
 from tests.conftest import e2e
 
+if TYPE_CHECKING:
+    from unittest.mock import Mock
 
-@pytest.mark.parametrize("url", list(BooxUrl))
-def test_sync_token_raises_token_missing_error(mocked_client: mock.Mock, url: BooxUrl):
-    with (
-        Boox(client=mocked_client, base_url=url) as boox,
-        pytest.raises(TokenMissingError, match="Bearer token is required to call this method"),
-    ):
-        boox.config_users.synchronize_token()
+    from faker import Faker
+    from pytest_mock import MockerFixture
+
+    from tests.api.config_users.conftest import FakeSyncTokenResponse
+    from tests.api.utils import E2EConfig
+
+
+def test_sync_token_raises_token_missing_error(mocked_boox: Boox):
+    with pytest.raises(TokenMissingError, match="Bearer token is required to call this method"):
+        mocked_boox.config_users.synchronize_token()
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
 def test_config_users_api_sync_token_integration(
-    mocker: MockerFixture,
-    faker: Faker,
-    fake_sync_token_response: FakeSyncTokenResponse,
-    mocked_client: mock.Mock,
+    mocker: "MockerFixture",
+    faker: "Faker",
+    fake_sync_token_response: "FakeSyncTokenResponse",
+    mocked_client: "Mock",
     url: BooxUrl,
 ):
     token = faker.uuid4()
@@ -49,7 +50,7 @@ def test_config_users_api_sync_token_integration(
 
 
 @e2e
-def test_synchronize_token_e2e(config: E2EConfig):
+def test_synchronize_token_e2e(config: "E2EConfig"):
     if not config.token:
         pytest.skip("Token was either not obtained or not set")
 

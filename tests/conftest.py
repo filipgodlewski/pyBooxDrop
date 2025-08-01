@@ -1,15 +1,16 @@
 import os
 from http import HTTPStatus
 from typing import TYPE_CHECKING, NamedTuple
-from unittest import mock
 
 import pytest
-from pytest_mock import MockerFixture
 
 if TYPE_CHECKING:
+    from unittest.mock import Mock
+
     from _pytest.config import Config
     from _pytest.config.argparsing import Parser
     from _pytest.nodes import Item
+    from pytest_mock import MockerFixture
 
 e2e = pytest.mark.e2e
 
@@ -32,8 +33,8 @@ def pytest_collection_modifyitems(config: "Config", items: list["Item"]) -> None
 
 
 @pytest.fixture
-def mocked_client(mocker: MockerFixture) -> mock.Mock:
-    client: mock.Mock = mocker.Mock()
+def mocked_client(mocker: "MockerFixture") -> "Mock":
+    client = mocker.Mock()
     client.is_closed = False
     client.base_url = None
     client.headers = {}
@@ -48,7 +49,7 @@ class ExpectedResponseData(NamedTuple):
 
 
 @pytest.fixture
-def mocked_urlopen(mocker: MockerFixture) -> ExpectedResponseData:
+def mocked_urlopen(mocker: "MockerFixture") -> ExpectedResponseData:
     data = ExpectedResponseData(HTTPStatus.OK, "https://foo.com/", {"X": "Y"}, b'{"foo": "bar"}')
     mocked_response = mocker.Mock()
     mocked_response.status = data.code

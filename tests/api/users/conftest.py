@@ -1,16 +1,20 @@
 from collections.abc import Iterator
 from contextlib import suppress
+from typing import TYPE_CHECKING
 
 import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
 from polyfactory.pytest_plugin import register_fixture
 
 from boox.models.users import FetchTokenResponse, SendVerifyResponse, SyncSessionTokenResponse, UserInfoResponse
-from tests.api.utils import E2EConfig, EmailProvider
+from tests.api.utils import EmailProvider
+
+if TYPE_CHECKING:
+    from tests.api.utils import E2EConfig
 
 
 @pytest.fixture(scope="session")
-def email(config: E2EConfig) -> Iterator[EmailProvider]:
+def email(config: "E2EConfig") -> Iterator[EmailProvider]:
     """An email provider for connecting to an SMTP server.
 
     Useful for getting the verification code.

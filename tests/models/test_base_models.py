@@ -1,23 +1,33 @@
+from typing import TYPE_CHECKING
+
 import pytest
 from pydantic import ValidationError
 
 from boox.models.base import BaseResponse, BaseSyncResponse
 
-
-def test_base_response_str_format():
-    response = BaseResponse(data=None, message="foo", result_code=123)
-    assert str(response) == "<123: foo>"
+if TYPE_CHECKING:
+    from faker import Faker
 
 
-def test_subclass_response_repr_format():
+def test_base_response_str_format(faker: "Faker"):
+    message = faker.pystr()
+    result_code = faker.random_digit()
+    response = BaseResponse(data=None, message=message, result_code=result_code)
+    assert str(response) == f"<{result_code}: {message}>"
+
+
+def test_subclass_response_repr_format(faker: "Faker"):
+    message = faker.pystr()
+    result_code = faker.random_digit()
+
     class DummyResponse(BaseResponse[None]): ...
 
-    response = DummyResponse(data=None, message="foo", result_code=123)
-    assert repr(response) == "DummyResponse(<123: foo>)"
+    response = DummyResponse(data=None, message=message, result_code=result_code)
+    assert repr(response) == f"DummyResponse(<{result_code}: {message}>)"
 
 
-def test_base_sync_subclass_raises_error_if_no_token_expiry_date_provided():
+def test_base_sync_subclass_raises_error_if_no_token_expiry_date_provided(faker: "Faker"):
     class DummySyncResponse(BaseSyncResponse[None]): ...
 
-    with pytest.raises(ValidationError, match=r"Field required"):
-        DummySyncResponse.model_validate({"data": None, "message": "foo", "result_code": 123})
+    with pytest.raises(ValidationError, match="Field required"):
+        DummySyncResponse.model_validate({"data": None, "message": faker.pystr(), "result_code": faker.random_digit()})

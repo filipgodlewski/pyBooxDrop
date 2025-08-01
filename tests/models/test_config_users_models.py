@@ -1,14 +1,18 @@
 import datetime
+from typing import TYPE_CHECKING
 
 from boox.models.config_users import SyncTokenResponse
 
+if TYPE_CHECKING:
+    from faker import Faker
 
-def test_sync_token_response_parses_token_expiration_date_correctly():
-    token_expiry = datetime.datetime.now(tz=datetime.UTC).replace(microsecond=0) + datetime.timedelta(days=180)
+
+def test_sync_token_response_parses_token_expiration_date_correctly(faker: "Faker"):
+    token_expiry = faker.date_time(tzinfo=datetime.UTC).replace(microsecond=0)
     data = SyncTokenResponse.model_validate({
         "data": None,
-        "message": "SUCCESS",
-        "result_code": 0,
+        "message": faker.pystr(),
+        "result_code": faker.random_digit(),
         "tokenExpiredAt": int(token_expiry.timestamp()),
     })
     assert not data.data

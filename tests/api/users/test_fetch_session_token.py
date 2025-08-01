@@ -1,24 +1,29 @@
-from unittest import mock
+from typing import TYPE_CHECKING
 
 import pytest
-from faker import Faker
-from pytest_mock import MockerFixture
 
 from boox.api.users import UsersApi
 from boox.core import Boox
 from boox.models.enums import BooxUrl
 from boox.models.users import DataToken, FetchTokenRequest, FetchTokenResponse
-from tests.api.users.conftest import FakeFetchTokenResponse
-from tests.api.utils import E2EConfig
 from tests.conftest import e2e
+
+if TYPE_CHECKING:
+    from unittest.mock import Mock
+
+    from faker import Faker
+    from pytest_mock import MockerFixture
+
+    from tests.api.users.conftest import FakeFetchTokenResponse
+    from tests.api.utils import E2EConfig
 
 # pyright: reportPrivateUsage=false
 
 
 def test_fetch_session_token_calls_post_and_parses_response(
-    mocker: MockerFixture,
-    faker: Faker,
-    fake_fetch_token_response: FakeFetchTokenResponse,
+    mocker: "MockerFixture",
+    faker: "Faker",
+    fake_fetch_token_response: "FakeFetchTokenResponse",
 ):
     mocked_response = mocker.Mock()
     mocked_response.json.return_value = fake_fetch_token_response.build().model_dump()
@@ -34,10 +39,10 @@ def test_fetch_session_token_calls_post_and_parses_response(
 
 @pytest.mark.parametrize("url", list(BooxUrl))
 def test_users_api_fetch_session_token_integration(
-    mocker: MockerFixture,
-    faker: Faker,
-    fake_fetch_token_response: FakeFetchTokenResponse,
-    mocked_client: mock.Mock,
+    mocker: "MockerFixture",
+    faker: "Faker",
+    fake_fetch_token_response: "FakeFetchTokenResponse",
+    mocked_client: "Mock",
     url: BooxUrl,
 ):
     mocked_response = mocker.Mock()
@@ -58,7 +63,7 @@ def test_users_api_fetch_session_token_integration(
 
 @e2e
 @pytest.mark.order(1)
-def test_fetch_session_token_e2e(config: E2EConfig):
+def test_fetch_session_token_e2e(config: "E2EConfig"):
     if not config.verification_code:
         pytest.skip("Verification code was either not obtained or not set")
     payload = FetchTokenRequest.model_validate({"mobi": config.email_address, "code": config.verification_code})

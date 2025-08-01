@@ -1,22 +1,25 @@
-import json
 from http import HTTPStatus
 from http.client import HTTPMessage
-from json import JSONDecodeError
+from json import JSONDecodeError, loads
+from typing import TYPE_CHECKING
 from urllib.error import HTTPError
 
 import pytest
-from pytest_mock import MockerFixture
 
 from boox.client import BaseHttpClient, BaseHTTPError, BaseHttpResponse
-from tests.conftest import ExpectedResponseData
 
-# pyright: reportPrivateUsage=false
+if TYPE_CHECKING:
+    from pytest_mock import MockerFixture
+
+    from tests.conftest import ExpectedResponseData
 
 SUCCESSES = (HTTPStatus.OK, HTTPStatus.CREATED, HTTPStatus.NO_CONTENT)
 FAILURES = (HTTPStatus.BAD_REQUEST, HTTPStatus.NOT_FOUND, HTTPStatus.INTERNAL_SERVER_ERROR)
 
+# pyright: reportPrivateUsage=false
 
-def assert_response(actual: BaseHttpResponse, expected_data: ExpectedResponseData):
+
+def assert_response(actual: BaseHttpResponse, expected_data: "ExpectedResponseData"):
     assert isinstance(actual, BaseHttpResponse)
     assert actual._code == expected_data.code
     assert actual._url == expected_data.url
@@ -76,7 +79,7 @@ def test_build_request_with_json_payload():
     assert request.get_method() == "POST"
 
 
-def test_request_error_is_caught_and_can_be_raised_for_status(mocker: MockerFixture):
+def test_request_error_is_caught_and_can_be_raised_for_status(mocker: "MockerFixture"):
     client = BaseHttpClient()
     headers = HTTPMessage()
     headers.add_header("X", "Y")
@@ -92,13 +95,13 @@ def test_request_error_is_caught_and_can_be_raised_for_status(mocker: MockerFixt
     assert e.value.headers == {"X": "Y"}
 
 
-def test_send_populates_response_fields_correctly(mocker: MockerFixture, mocked_urlopen: ExpectedResponseData):
+def test_send_populates_response_fields_correctly(mocker: "MockerFixture", mocked_urlopen: "ExpectedResponseData"):
     client = BaseHttpClient()
     response = client._send(request=mocker.Mock())
     assert_response(response, mocked_urlopen)
 
 
-def test_get_populates_response_fields_correctly(mocker: MockerFixture, mocked_urlopen: ExpectedResponseData):
+def test_get_populates_response_fields_correctly(mocker: "MockerFixture", mocked_urlopen: "ExpectedResponseData"):
     client = BaseHttpClient()
     spy = mocker.spy(client, "_build_request")
     response = client.get(mocked_urlopen.url)
@@ -107,17 +110,17 @@ def test_get_populates_response_fields_correctly(mocker: MockerFixture, mocked_u
     assert_response(response, mocked_urlopen)
 
 
-def test_post_populates_response_fields_correctly(mocker: MockerFixture, mocked_urlopen: ExpectedResponseData):
+def test_post_populates_response_fields_correctly(mocker: "MockerFixture", mocked_urlopen: "ExpectedResponseData"):
     client = BaseHttpClient()
     spy = mocker.spy(client, "_build_request")
-    payload = json.loads(mocked_urlopen.content)
+    payload = loads(mocked_urlopen.content)
     response = client.post(mocked_urlopen.url, payload)
 
     spy.assert_called_once_with("POST", mocked_urlopen.url, payload)
     assert_response(response, mocked_urlopen)
 
 
-def test_delete_populates_response_fields_correctly(mocker: MockerFixture, mocked_urlopen: ExpectedResponseData):
+def test_delete_populates_response_fields_correctly(mocker: "MockerFixture", mocked_urlopen: "ExpectedResponseData"):
     client = BaseHttpClient()
     spy = mocker.spy(client, "_build_request")
     response = client.delete(mocked_urlopen.url)

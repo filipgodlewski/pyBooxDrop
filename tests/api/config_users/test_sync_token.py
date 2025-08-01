@@ -26,13 +26,13 @@ def test_sync_token_raises_token_missing_error(mocked_client: mock.Mock, url: Bo
 def test_config_users_api_sync_token_integration(
     mocker: MockerFixture,
     faker: Faker,
-    sync_token_response: FakeSyncTokenResponse,
+    fake_sync_token_response: FakeSyncTokenResponse,
     mocked_client: mock.Mock,
     url: BooxUrl,
 ):
     token = faker.uuid4()
 
-    return_value = sync_token_response.build()
+    return_value = fake_sync_token_response.build()
     mocked_response = mocker.Mock()
     mocked_response.json = mocker.Mock(return_value=return_value.model_dump())
     mocked_response.raise_for_status.return_value = mocked_response

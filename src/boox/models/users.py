@@ -9,7 +9,6 @@ from pydantic import (
     EmailStr,
     Field,
     PlainSerializer,
-    RootModel,
     SecretStr,
     StringConstraints,
     model_validator,
@@ -156,7 +155,7 @@ class UserInfoResponse(BaseSyncResponse[DataUser]):
     """A response with basic account information."""
 
 
-class DataDeviceItem(BaseModel):
+class DataDevice(BaseModel):
     model_config: ClassVar[ConfigDict] = ConfigDict(serialize_by_alias=True)
 
     installation_map: dict[str, Any] = Field(alias="installationMap")
@@ -188,13 +187,9 @@ class DataDeviceItem(BaseModel):
     login_status: str = Field(alias="loginStatus")
 
 
-class DataDevice(RootModel[tuple[DataDeviceItem, ...]]): ...
-
-
-class DeviceInfoResponse(BaseSyncResponse[DataDevice]):
+class DeviceInfoResponse(BaseSyncResponse[tuple[DataDevice, ...]]):
     """A response with basic device information.
 
     Since this response can contain information about many devices,
-    the `data` field is wrapped in `DataDevice` RootModel,
-    which's root is a tuple of `DataDeviceItem`(s).
+    the `data` field is wrapped in a tuple of `DataDevice`(s).
     """

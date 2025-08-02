@@ -102,7 +102,7 @@ class UsersApi(Api):
 
         Returns:
             DeviceInfoResponse: The validated response containing device(s) information.
-                Please be aware that it actually is a RootModel, where the root is a `tuple[DataDeviceItem, ...]`
+                Please be aware that the `data` field is a variable-length tuple of `DataDevice`.
         """
         response = self._get(endpoint="/api/1/users/getDevice")
         return DeviceInfoResponse.model_validate(response.json())

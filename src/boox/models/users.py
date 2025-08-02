@@ -9,6 +9,7 @@ from pydantic import (
     EmailStr,
     Field,
     PlainSerializer,
+    RootModel,
     SecretStr,
     StringConstraints,
     model_validator,
@@ -153,3 +154,47 @@ class DataUser(BaseModel):
 
 class UserInfoResponse(BaseSyncResponse[DataUser]):
     """A response with basic account information."""
+
+
+class DataDeviceItem(BaseModel):
+    model_config: ClassVar[ConfigDict] = ConfigDict(serialize_by_alias=True)
+
+    installation_map: dict[str, Any] = Field(alias="installationMap")
+    id: int
+    model: str
+    device_unique_id: str = Field(alias="deviceUniqueId")
+    mac_address: str = Field(alias="macAddress")  # TODO: consider pydantic_extra_types.mac_address
+    number: Any | None
+    version_int: int = Field(alias="versionInt")
+    version_release: str = Field(alias="versionRelease")
+    width: int
+    height: int
+    brand: str
+    system: Any | None
+    channel: Any | None
+    build_id: str = Field(alias="buildId")
+    modfingerprintel: Any | None
+    timezone: Any | None
+    name: Any | None
+    details: str
+    current_account_id: Any | None = Field(alias="currentAccountId")
+    lock: int
+    im_account: str = Field(alias="imAccount")
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
+    org_id: Any | None
+    latest_login_time: datetime.datetime = Field(alias="latestLoginTime")
+    latest_logout_time: datetime.datetime = Field(alias="latestLogoutTime")
+    login_status: str = Field(alias="loginStatus")
+
+
+class DataDevice(RootModel[tuple[DataDeviceItem, ...]]): ...
+
+
+class DeviceInfoResponse(BaseSyncResponse[DataDevice]):
+    """A response with basic device information.
+
+    Since this response can contain information about many devices,
+    the `data` field is wrapped in `DataDevice` RootModel,
+    which's root is a tuple of `DataDeviceItem`(s).
+    """

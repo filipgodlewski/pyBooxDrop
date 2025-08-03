@@ -36,8 +36,9 @@ GET /api/1/configUsers/one
 <details><summary>users/ endpoints</summary>
 
 ```http
-GET /api/1/users/syncToken
+GET /api/1/users/getDevice
 GET /api/1/users/me
+GET /api/1/users/syncToken
 POST /api/1/users/sendVerifyCode
 POST /api/1/users/signupByPhoneOrEmail
 ```

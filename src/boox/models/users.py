@@ -18,6 +18,9 @@ from pydantic_core import PydanticCustomError
 
 from boox.models.base import BaseResponse, BaseSyncResponse
 
+# NOTE: If having `Any`, it means that it lacks information on type based on my internal testing.
+# If you have some additional data, please contribute.
+
 
 def soft_validate_email(value: str) -> bool:
     with suppress(PydanticCustomError):
@@ -114,8 +117,6 @@ class SyncSessionTokenResponse(BaseSyncResponse[DataSession]):
 
 
 class DataUser(BaseModel):
-    # NOTE: If having `Any`, it means that it lacks information on type based on my internal testing.
-    # If you have some additional data, please contribute.
     model_config: ClassVar[ConfigDict] = ConfigDict(serialize_by_alias=True)
 
     access_token: Any | None = Field(alias="accessToken")
@@ -153,3 +154,43 @@ class DataUser(BaseModel):
 
 class UserInfoResponse(BaseSyncResponse[DataUser]):
     """A response with basic account information."""
+
+
+class DataDevice(BaseModel):
+    model_config: ClassVar[ConfigDict] = ConfigDict(serialize_by_alias=True)
+
+    installation_map: dict[str, Any] = Field(alias="installationMap")
+    id: int
+    model: str
+    device_unique_id: str = Field(alias="deviceUniqueId")
+    mac_address: str = Field(alias="macAddress")
+    number: Any | None
+    version_int: int = Field(alias="versionInt")
+    version_release: str = Field(alias="versionRelease")
+    width: int
+    height: int
+    brand: str
+    system: Any | None
+    channel: Any | None
+    build_id: str = Field(alias="buildId")
+    modfingerprintel: Any | None
+    timezone: Any | None
+    name: Any | None
+    details: str
+    current_account_id: Any | None = Field(alias="currentAccountId")
+    lock: int
+    im_account: str = Field(alias="imAccount")
+    created_at: datetime.datetime
+    updated_at: datetime.datetime
+    org_id: Any | None
+    latest_login_time: datetime.datetime = Field(alias="latestLoginTime")
+    latest_logout_time: datetime.datetime = Field(alias="latestLogoutTime")
+    login_status: str = Field(alias="loginStatus")
+
+
+class DeviceInfoResponse(BaseSyncResponse[tuple[DataDevice, ...]]):
+    """A response with basic device information.
+
+    Since this response can contain information about many devices,
+    the `data` field is wrapped in a tuple of `DataDevice`(s).
+    """

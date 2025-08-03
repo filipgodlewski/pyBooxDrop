@@ -17,6 +17,6 @@ def config() -> E2EConfig:
 
 
 @pytest.fixture
-def mocked_boox(mocked_client: "Mock") -> Iterator[Boox]:
-    with Boox(client=mocked_client, base_url=BooxUrl.EUR) as boox:
+def mock_boox(mock_client: "Mock") -> Iterator[Boox]:
+    with Boox(client=mock_client, base_url=BooxUrl.EUR) as boox:
         yield boox

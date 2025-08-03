@@ -25,10 +25,8 @@ def test_fetch_session_token_calls_post_and_parses_response(
     faker: "Faker",
     fake_fetch_token_response: "FakeFetchTokenResponse",
 ):
-    mocked_response = mocker.Mock()
-    mocked_response.json.return_value = fake_fetch_token_response.build().model_dump()
     api = UsersApi(session=mocker.Mock())
-    api._post = mocker.Mock(return_value=mocked_response)
+    api._post = mocker.Mock(return_value=mocker.Mock(json=fake_fetch_token_response.build().model_dump))
 
     send_data = {"mobi": faker.email(), "code": str(faker.random_number(digits=6))}
     result = api.fetch_session_token(payload=FetchTokenRequest.model_validate(send_data))
@@ -38,25 +36,25 @@ def test_fetch_session_token_calls_post_and_parses_response(
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_users_api_fetch_session_token_integration(
+def test_users_api_fetch_session_token_parses_response_correctly(
     mocker: "MockerFixture",
     faker: "Faker",
     fake_fetch_token_response: "FakeFetchTokenResponse",
-    mocked_client: "Mock",
+    mock_client: "Mock",
     url: BooxUrl,
 ):
-    mocked_response = mocker.Mock()
-    mocked_response.json.return_value = fake_fetch_token_response.build().model_dump()
-    mocked_response.raise_for_status.return_value = mocked_response
-    mocked_client.post.return_value = mocked_response
+    mock_response = mocker.Mock()
+    mock_response.json.return_value = fake_fetch_token_response.build().model_dump()
+    mock_response.raise_for_status.return_value = mock_response
+    mock_client.post.return_value = mock_response
 
-    with Boox(client=mocked_client, base_url=url) as boox:
+    with Boox(client=mock_client, base_url=url) as boox:
         send_data = {"mobi": faker.email(), "code": str(faker.random_number(digits=6))}
         payload = FetchTokenRequest.model_validate(send_data)
         result = boox.users.fetch_session_token(payload=payload)
 
-    mocked_client.post.assert_called_once_with(url.value + "/api/1/users/signupByPhoneOrEmail", json=send_data)
-    mocked_response.json.assert_called_once()
+    mock_client.post.assert_called_once_with(url.value + "/api/1/users/signupByPhoneOrEmail", json=send_data)
+    mock_response.json.assert_called_once()
     assert isinstance(result, FetchTokenResponse)
     assert isinstance(result.data, DataToken)
 
@@ -69,7 +67,7 @@ def test_fetch_session_token_e2e(config: "E2EConfig"):
     payload = FetchTokenRequest.model_validate({"mobi": config.email_address, "code": config.verification_code})
 
     with Boox(base_url=config.domain) as boox:
-        response = boox.users.fetch_session_token(payload=payload)
+        result = boox.users.fetch_session_token(payload=payload)
 
-    assert response.data.token
-    config.token = response.data.token
+    assert result.data.token
+    config.token = result.data.token

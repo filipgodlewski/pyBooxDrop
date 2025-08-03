@@ -2,6 +2,7 @@ from pydantic import validate_call
 
 from boox.api.core import Api, requires_token
 from boox.models.users import (
+    DeviceInfoResponse,
     FetchTokenRequest,
     FetchTokenResponse,
     SendVerifyCodeRequest,
@@ -90,3 +91,18 @@ class UsersApi(Api):
         """
         response = self._get(endpoint="/api/1/users/me")
         return UserInfoResponse.model_validate(response.json())
+
+    @requires_token
+    def get_device_info(self) -> DeviceInfoResponse:
+        """A call to get information about the device(s) associated with the account.
+
+        This call **requires** the token to be passed as an Authorization header, e.g.:
+            >>> {"Authorization": "Bearer xyz123abc"}
+        That is also the reason why this call pre-validates the client header.
+
+        Returns:
+            DeviceInfoResponse: The validated response containing device(s) information.
+                Please be aware that the `data` field is a variable-length tuple of `DataDevice`.
+        """
+        response = self._get(endpoint="/api/1/users/getDevice")
+        return DeviceInfoResponse.model_validate(response.json())

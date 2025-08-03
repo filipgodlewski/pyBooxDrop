@@ -25,10 +25,8 @@ def test_get_user_info_calls_get_and_parses_response(
     mocker: "MockerFixture",
     fake_user_info_response: "FakeUserInfoResponse",
 ):
-    mocked_response = mocker.Mock()
-    mocked_response.json.return_value = fake_user_info_response.build().model_dump()
     api = UsersApi(session=mocker.Mock())
-    api._get = mocker.Mock(return_value=mocked_response)
+    api._get = mocker.Mock(return_value=mocker.Mock(json=fake_user_info_response.build().model_dump))
 
     result = api.get_user_info()
 
@@ -38,30 +36,31 @@ def test_get_user_info_calls_get_and_parses_response(
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_users_api_get_user_info_integration(
+def test_users_api_get_user_info_parses_response_correctly(
     mocker: "MockerFixture",
     faker: "Faker",
     fake_user_info_response: "FakeUserInfoResponse",
-    mocked_client: "Mock",
+    mock_client: "Mock",
     url: BooxUrl,
 ):
-    mocked_response = mocker.Mock()
-    mocked_response.json.return_value = fake_user_info_response.build().model_dump()
-    mocked_response.raise_for_status.return_value = mocked_response
-    mocked_client.get.return_value = mocked_response
+    mock_response = mocker.Mock()
+    mock_response.json.return_value = fake_user_info_response.build().model_dump()
+    mock_response.raise_for_status.return_value = mock_response
+    mock_client.get.return_value = mock_response
 
-    with Boox(client=mocked_client, base_url=url, token=faker.uuid4()) as boox:
+    with Boox(client=mock_client, base_url=url, token=faker.uuid4()) as boox:
         result = boox.users.get_user_info()
 
-    mocked_client.get.assert_called_once_with(url.value + "/api/1/users/me")
-    mocked_response.json.assert_called_once()
+    mock_client.get.assert_called_once_with(url.value + "/api/1/users/me")
+    mock_response.json.assert_called_once()
+    mock_response.raise_for_status.assert_called_once()
     assert isinstance(result, UserInfoResponse)
     assert isinstance(result.data, DataUser)
 
 
-def test_get_user_info_raises_token_missing_error(mocked_boox: Boox):
+def test_get_user_info_raises_token_missing_error(mock_boox: Boox):
     with pytest.raises(TokenMissingError, match="Bearer token is required to call this method"):
-        mocked_boox.users.get_user_info()
+        mock_boox.users.get_user_info()
 
 
 @e2e
@@ -70,8 +69,8 @@ def test_get_user_info_e2e(config: "E2EConfig"):
         pytest.skip("Token was either not obtained or not set")
 
     with Boox(base_url=config.domain, token=config.token) as boox:
-        response = boox.users.get_user_info()
+        result = boox.users.get_user_info()
 
-    assert response.data.area_code
-    assert response.data.login_type == "email"
-    assert response.data.email == config.email_address
+    assert result.data.area_code
+    assert result.data.login_type == "email"
+    assert result.data.email == config.email_address

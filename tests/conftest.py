@@ -33,7 +33,7 @@ def pytest_collection_modifyitems(config: "Config", items: list["Item"]) -> None
 
 
 @pytest.fixture
-def mocked_client(mocker: "MockerFixture") -> "Mock":
+def mock_client(mocker: "MockerFixture") -> "Mock":
     client = mocker.Mock()
     client.is_closed = False
     client.base_url = None
@@ -49,12 +49,12 @@ class ExpectedResponseData(NamedTuple):
 
 
 @pytest.fixture
-def mocked_urlopen(mocker: "MockerFixture") -> ExpectedResponseData:
+def mock_urlopen(mocker: "MockerFixture") -> ExpectedResponseData:
     data = ExpectedResponseData(HTTPStatus.OK, "https://foo.com/", {"X": "Y"}, b'{"foo": "bar"}')
-    mocked_response = mocker.Mock()
-    mocked_response.status = data.code
-    mocked_response.geturl.return_value = data.url
-    mocked_response.headers = data.headers
-    mocked_response.read.return_value = data.content
-    mocker.patch("boox.client.urlopen").return_value.__enter__.return_value = mocked_response
+    mock_response = mocker.Mock()
+    mock_response.status = data.code
+    mock_response.geturl.return_value = data.url
+    mock_response.headers = data.headers
+    mock_response.read.return_value = data.content
+    mocker.patch("boox.client.urlopen").return_value.__enter__.return_value = mock_response
     return data

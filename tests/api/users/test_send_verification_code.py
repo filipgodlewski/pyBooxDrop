@@ -26,10 +26,8 @@ def test_send_verification_code_calls_post_and_parses_response(
     faker: "Faker",
     fake_send_verify_response: "FakeSendVerifyResponse",
 ):
-    mocked_response = mocker.Mock()
-    mocked_response.json.return_value = fake_send_verify_response.build().model_dump()
     api = UsersApi(session=mocker.Mock())
-    api._post = mocker.Mock(return_value=mocked_response)
+    api._post = mocker.Mock(return_value=mocker.Mock(json=fake_send_verify_response.build().model_dump))
 
     send_data = {"mobi": faker.email()}
     result = api.send_verification_code(payload=SendVerifyCodeRequest.model_validate(send_data))
@@ -39,25 +37,26 @@ def test_send_verification_code_calls_post_and_parses_response(
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_users_api_send_verification_code_integration(
+def test_users_api_send_verification_code_parses_response_correctly(
     mocker: "MockerFixture",
     faker: "Faker",
     fake_send_verify_response: "FakeSendVerifyResponse",
-    mocked_client: "Mock",
+    mock_client: "Mock",
     url: BooxUrl,
 ):
-    mocked_response = mocker.Mock()
-    mocked_response.json.return_value = fake_send_verify_response.build().model_dump()
-    mocked_response.raise_for_status.return_value = mocked_response
-    mocked_client.post.return_value = mocked_response
+    mock_response = mocker.Mock()
+    mock_response.json.return_value = fake_send_verify_response.build().model_dump()
+    mock_response.raise_for_status.return_value = mock_response
+    mock_client.post.return_value = mock_response
 
-    with Boox(client=mocked_client, base_url=url) as boox:
+    with Boox(client=mock_client, base_url=url) as boox:
         send_data = {"mobi": faker.email()}
         payload = SendVerifyCodeRequest.model_validate(send_data)
         result = boox.users.send_verification_code(payload=payload)
 
-    mocked_client.post.assert_called_once_with(url.value + "/api/1/users/sendVerifyCode", json=send_data)
-    mocked_response.json.assert_called_once()
+    mock_client.post.assert_called_once_with(url.value + "/api/1/users/sendVerifyCode", json=send_data)
+    mock_response.json.assert_called_once()
+    mock_response.raise_for_status.assert_called_once()
     assert isinstance(result, SendVerifyResponse)
 
 
@@ -67,9 +66,9 @@ def test_send_verification_code_e2e(config: "E2EConfig", email: "EmailProvider")
     payload = SendVerifyCodeRequest.model_validate({"mobi": config.email_address})
 
     with Boox(base_url=config.domain) as boox:
-        response = boox.users.send_verification_code(payload=payload)
+        result = boox.users.send_verification_code(payload=payload)
 
-    assert response.data == "ok"
+    assert result.data == "ok"
     message = email.get_newest_message()
     match = re.compile(r"^The code is (?P<code>\d{6}) for account verification from BOOX\.").match(message)
     assert match, "Did not match the received email"

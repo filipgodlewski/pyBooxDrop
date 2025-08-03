@@ -22,7 +22,8 @@ if TYPE_CHECKING:
 
 
 def test_get_user_info_calls_get_and_parses_response(
-    mocker: "MockerFixture", fake_user_info_response: "FakeUserInfoResponse"
+    mocker: "MockerFixture",
+    fake_user_info_response: "FakeUserInfoResponse",
 ):
     api = UsersApi(session=mocker.Mock())
     api._get = mocker.Mock(return_value=mocker.Mock(json=fake_user_info_response.build().model_dump))

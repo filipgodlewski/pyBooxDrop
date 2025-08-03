@@ -22,7 +22,8 @@ if TYPE_CHECKING:
 
 
 def test_sync_session_token_calls_get_and_parses_response(
-    mocker: "MockerFixture", fake_sync_session_token_response: "FakeSyncSessionTokenResponse"
+    mocker: "MockerFixture",
+    fake_sync_session_token_response: "FakeSyncSessionTokenResponse",
 ):
     api = UsersApi(session=mocker.Mock())
     api._get = mocker.Mock(return_value=mocker.Mock(json=fake_sync_session_token_response.build().model_dump))

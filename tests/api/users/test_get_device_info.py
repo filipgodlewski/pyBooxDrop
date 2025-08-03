@@ -22,7 +22,8 @@ if TYPE_CHECKING:
 
 
 def test_get_device_info_parses_response_correctly(
-    mocker: "MockerFixture", fake_device_info_response: "FakeDeviceInfoResponse"
+    mocker: "MockerFixture",
+    fake_device_info_response: "FakeDeviceInfoResponse",
 ):
     api = UsersApi(session=mocker.Mock())
     api._get = mocker.Mock(return_value=mocker.Mock(json=fake_device_info_response.build().model_dump))

@@ -41,7 +41,7 @@ def test_sync_session_token_raises_token_missing_error(mock_boox: Boox):
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_users_api_sync_session_token_integration(
+def test_users_api_sync_session_token_parses_response_correctly(
     mocker: "MockerFixture",
     faker: "Faker",
     fake_sync_session_token_response: "FakeSyncSessionTokenResponse",

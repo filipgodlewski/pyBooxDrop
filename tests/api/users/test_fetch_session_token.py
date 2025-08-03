@@ -36,7 +36,7 @@ def test_fetch_session_token_calls_post_and_parses_response(
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_users_api_fetch_session_token_integration(
+def test_users_api_fetch_session_token_parses_response_correctly(
     mocker: "MockerFixture",
     faker: "Faker",
     fake_fetch_token_response: "FakeFetchTokenResponse",

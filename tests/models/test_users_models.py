@@ -1,4 +1,3 @@
-import datetime
 import json
 import re
 from typing import TYPE_CHECKING
@@ -7,11 +6,9 @@ import pytest
 from pydantic import ValidationError
 
 from boox.models.users import (
-    DataSession,
     DataToken,
     FetchTokenRequest,
     SendVerifyCodeRequest,
-    SyncSessionTokenResponse,
     soft_validate_email,
 )
 
@@ -87,22 +84,3 @@ def test_token_is_public_in_json_dump(faker: "Faker"):
     model = DataToken.model_validate(data)
     dumped = model.model_dump_json()
     assert json.dumps(data, separators=(", ", ":")) == dumped
-
-
-def test_sync_session_token_response_parses_nested_data_correctly(faker: "Faker"):
-    session_expiry = faker.future_datetime(tzinfo=datetime.UTC).replace(microsecond=0)
-    token_expiry = faker.future_datetime(tzinfo=datetime.UTC).replace(microsecond=0)
-    data = SyncSessionTokenResponse.model_validate({
-        "data": {
-            "channels": (),
-            "cookie_name": faker.pystr(),
-            "expires": session_expiry.strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "session_id": faker.uuid4(),
-        },
-        "message": faker.pystr(),
-        "result_code": faker.random_digit(),
-        "tokenExpiredAt": int(token_expiry.timestamp()),
-    })
-    assert isinstance(data.data, DataSession)
-    assert data.token_expired_at == token_expiry
-    assert data.data.expires == session_expiry

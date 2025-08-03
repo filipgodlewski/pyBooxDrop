@@ -35,9 +35,9 @@ def test_sync_session_token_calls_get_and_parses_response(
     assert isinstance(result.data, DataSession)
 
 
-def test_sync_session_token_raises_token_missing_error(mocked_boox: Boox):
+def test_sync_session_token_raises_token_missing_error(mock_boox: Boox):
     with pytest.raises(TokenMissingError, match="Bearer token is required to call this method"):
-        mocked_boox.users.synchronize_session_token()
+        mock_boox.users.synchronize_session_token()
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))

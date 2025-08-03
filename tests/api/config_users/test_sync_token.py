@@ -18,9 +18,9 @@ if TYPE_CHECKING:
     from tests.api.utils import E2EConfig
 
 
-def test_sync_token_raises_token_missing_error(mocked_boox: Boox):
+def test_sync_token_raises_token_missing_error(mock_boox: Boox):
     with pytest.raises(TokenMissingError, match="Bearer token is required to call this method"):
-        mocked_boox.config_users.synchronize_token()
+        mock_boox.config_users.synchronize_token()
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))

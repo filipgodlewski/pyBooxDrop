@@ -36,9 +36,9 @@ def test_get_device_info_parses_response_correctly(
     assert all(isinstance(d, DataDevice) for d in result.data)
 
 
-def test_get_user_info_raises_token_missing_error(mocked_boox: Boox):
+def test_get_user_info_raises_token_missing_error(mock_boox: Boox):
     with pytest.raises(TokenMissingError, match="Bearer token is required to call this method"):
-        mocked_boox.users.get_device_info()
+        mock_boox.users.get_device_info()
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))

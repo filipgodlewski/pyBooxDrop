@@ -70,6 +70,7 @@ def test_get_device_info_e2e(config: "E2EConfig"):
         pytest.skip("Token was either not obtained or not set")
 
     with Boox(base_url=config.domain, token=config.token) as boox:
-        response = boox.users.get_device_info()
+        result = boox.users.get_device_info()
 
-    assert response  # TODO: refine
+    assert isinstance(result.data, tuple)
+    assert all(d.id for d in result.data)

@@ -49,7 +49,7 @@ class ExpectedResponseData(NamedTuple):
 
 
 @pytest.fixture
-def mocked_urlopen(mocker: "MockerFixture") -> ExpectedResponseData:
+def mock_urlopen(mocker: "MockerFixture") -> ExpectedResponseData:
     data = ExpectedResponseData(HTTPStatus.OK, "https://foo.com/", {"X": "Y"}, b'{"foo": "bar"}')
     mocked_response = mocker.Mock()
     mocked_response.status = data.code

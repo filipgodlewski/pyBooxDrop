@@ -95,38 +95,38 @@ def test_request_error_is_caught_and_can_be_raised_for_status(mocker: "MockerFix
     assert e.value.headers == {"X": "Y"}
 
 
-def test_send_populates_response_fields_correctly(mocker: "MockerFixture", mocked_urlopen: "ExpectedResponseData"):
+def test_send_populates_response_fields_correctly(mocker: "MockerFixture", mock_urlopen: "ExpectedResponseData"):
     client = BaseHttpClient()
     response = client._send(request=mocker.Mock())
-    assert_response(response, mocked_urlopen)
+    assert_response(response, mock_urlopen)
 
 
-def test_get_populates_response_fields_correctly(mocker: "MockerFixture", mocked_urlopen: "ExpectedResponseData"):
+def test_get_populates_response_fields_correctly(mocker: "MockerFixture", mock_urlopen: "ExpectedResponseData"):
     client = BaseHttpClient()
     spy = mocker.spy(client, "_build_request")
-    response = client.get(mocked_urlopen.url)
+    response = client.get(mock_urlopen.url)
 
-    spy.assert_called_once_with("GET", mocked_urlopen.url, None)
-    assert_response(response, mocked_urlopen)
+    spy.assert_called_once_with("GET", mock_urlopen.url, None)
+    assert_response(response, mock_urlopen)
 
 
-def test_post_populates_response_fields_correctly(mocker: "MockerFixture", mocked_urlopen: "ExpectedResponseData"):
+def test_post_populates_response_fields_correctly(mocker: "MockerFixture", mock_urlopen: "ExpectedResponseData"):
     client = BaseHttpClient()
     spy = mocker.spy(client, "_build_request")
-    payload = loads(mocked_urlopen.content)
-    response = client.post(mocked_urlopen.url, payload)
+    payload = loads(mock_urlopen.content)
+    response = client.post(mock_urlopen.url, payload)
 
-    spy.assert_called_once_with("POST", mocked_urlopen.url, payload)
-    assert_response(response, mocked_urlopen)
+    spy.assert_called_once_with("POST", mock_urlopen.url, payload)
+    assert_response(response, mock_urlopen)
 
 
-def test_delete_populates_response_fields_correctly(mocker: "MockerFixture", mocked_urlopen: "ExpectedResponseData"):
+def test_delete_populates_response_fields_correctly(mocker: "MockerFixture", mock_urlopen: "ExpectedResponseData"):
     client = BaseHttpClient()
     spy = mocker.spy(client, "_build_request")
-    response = client.delete(mocked_urlopen.url)
+    response = client.delete(mock_urlopen.url)
 
-    spy.assert_called_once_with("DELETE", mocked_urlopen.url, None)
-    assert_response(response, mocked_urlopen)
+    spy.assert_called_once_with("DELETE", mock_urlopen.url, None)
+    assert_response(response, mock_urlopen)
 
 
 @pytest.mark.parametrize("code", SUCCESSES)

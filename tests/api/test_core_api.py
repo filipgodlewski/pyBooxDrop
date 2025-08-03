@@ -29,18 +29,18 @@ def test_api_cannot_be_instantiated_directly(mocker: "MockerFixture"):
 
 
 def test_prepare_url_raises_without_base_url(mocker: "MockerFixture"):
-    mocked_session = mocker.Mock()
-    mocked_session.base_url = None
-    api = DummyApi(session=mocked_session)
+    mock_session = mocker.Mock()
+    mock_session.base_url = None
+    api = DummyApi(session=mock_session)
     with pytest.raises(ValueError, match=r"base_url must be filled"):
         api._prepare_url("/endpoint")
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
 def test_prepare_url_joins_base_and_endpoint_without_leading_slash(mocker: "MockerFixture", url: BooxUrl):
-    mocked_session = mocker.Mock()
-    mocked_session.base_url = url
-    api = DummyApi(session=mocked_session)
+    mock_session = mocker.Mock()
+    mock_session.base_url = url
+    api = DummyApi(session=mock_session)
 
     endpoint = "endpoint"
     assert api._prepare_url(endpoint) == f"{url.value}/{endpoint}"
@@ -48,18 +48,18 @@ def test_prepare_url_joins_base_and_endpoint_without_leading_slash(mocker: "Mock
 
 @pytest.mark.parametrize("url", list(BooxUrl))
 def test_prepare_url_joins_base_and_endpoint_with_leading_slash(mocker: "MockerFixture", url: BooxUrl):
-    mocked_session = mocker.Mock()
-    mocked_session.base_url = url
-    api = DummyApi(session=mocked_session)
+    mock_session = mocker.Mock()
+    mock_session.base_url = url
+    api = DummyApi(session=mock_session)
     endpoint = "/endpoint"
     assert api._prepare_url(endpoint) == f"{url.value}{endpoint}"
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
 def test_prepare_url_strips_trailing_slash(mocker: "MockerFixture", url: BooxUrl):
-    mocked_session = mocker.Mock()
-    mocked_session.base_url = url + "/"
-    api = DummyApi(session=mocked_session)
+    mock_session = mocker.Mock()
+    mock_session.base_url = url + "/"
+    api = DummyApi(session=mock_session)
     endpoint = "/endpoint"
     assert api._prepare_url(endpoint) == f"{url.value}{endpoint}"
 
@@ -71,10 +71,10 @@ def test_post_calls_client_and_checks_status(mocker: "MockerFixture"):
     mock_client = mocker.Mock()
     mock_client.post = mocker.Mock(return_value=mocked_response)
 
-    mocked_session = mocker.Mock()
-    mocked_session.client = mock_client
+    mock_session = mocker.Mock()
+    mock_session.client = mock_client
 
-    api = DummyApi(session=mocked_session)
+    api = DummyApi(session=mock_session)
     api._prepare_url = mocker.patch.object(api, "_prepare_url", return_value="https://foo.com/endpoint")
 
     result = api._post(endpoint="/endpoint", json={"foo": "bar"})
@@ -93,10 +93,10 @@ def test_post_raises_on_http_error(mocker: "MockerFixture"):
     mock_client = mocker.Mock()
     mock_client.post = mocker.Mock(return_value=mocked_response)
 
-    mocked_session = mocker.Mock()
-    mocked_session.client = mock_client
+    mock_session = mocker.Mock()
+    mock_session.client = mock_client
 
-    api = DummyApi(session=mocked_session)
+    api = DummyApi(session=mock_session)
     api._prepare_url = mocker.patch.object(api, "_prepare_url", return_value=url)
 
     with pytest.raises(BaseHTTPError):
@@ -104,19 +104,19 @@ def test_post_raises_on_http_error(mocker: "MockerFixture"):
 
 
 def test_method_raises_error_for_missing_token(mock_client: "Mock"):
-    mocked_session = Boox(client=mock_client)
+    mock_session = Boox(client=mock_client)
 
-    api = DummyApi(session=mocked_session)
+    api = DummyApi(session=mock_session)
 
     with pytest.raises(TokenMissingError, match="Bearer token is required to call this method"):
         api.dummy_method()
 
 
 def test_method_succeeds_with_token(faker: "Faker", mock_client: "Mock"):
-    mocked_session = Boox(client=mock_client)
-    mocked_session.token = faker.uuid4()
+    mock_session = Boox(client=mock_client)
+    mock_session.token = faker.uuid4()
 
-    api = DummyApi(session=mocked_session)
+    api = DummyApi(session=mock_session)
 
     assert api.dummy_method()
 
@@ -128,10 +128,10 @@ def test_get_calls_client_and_checks_status(mocker: "MockerFixture"):
     mock_client = mocker.Mock()
     mock_client.get = mocker.Mock(return_value=mocked_response)
 
-    mocked_session = mocker.Mock()
-    mocked_session.client = mock_client
+    mock_session = mocker.Mock()
+    mock_session.client = mock_client
 
-    api = DummyApi(session=mocked_session)
+    api = DummyApi(session=mock_session)
     api._prepare_url = mocker.patch.object(api, "_prepare_url", return_value="https://foo.com/endpoint")
 
     result = api._get(endpoint="/endpoint")

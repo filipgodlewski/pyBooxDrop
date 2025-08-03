@@ -44,10 +44,10 @@ def test_users_api_send_verification_code_parses_response_correctly(
     mock_client: "Mock",
     url: BooxUrl,
 ):
-    mocked_response = mocker.Mock()
-    mocked_response.json.return_value = fake_send_verify_response.build().model_dump()
-    mocked_response.raise_for_status.return_value = mocked_response
-    mock_client.post.return_value = mocked_response
+    mock_response = mocker.Mock()
+    mock_response.json.return_value = fake_send_verify_response.build().model_dump()
+    mock_response.raise_for_status.return_value = mock_response
+    mock_client.post.return_value = mock_response
 
     with Boox(client=mock_client, base_url=url) as boox:
         send_data = {"mobi": faker.email()}
@@ -55,8 +55,8 @@ def test_users_api_send_verification_code_parses_response_correctly(
         result = boox.users.send_verification_code(payload=payload)
 
     mock_client.post.assert_called_once_with(url.value + "/api/1/users/sendVerifyCode", json=send_data)
-    mocked_response.json.assert_called_once()
-    mocked_response.raise_for_status.assert_called_once()
+    mock_response.json.assert_called_once()
+    mock_response.raise_for_status.assert_called_once()
     assert isinstance(result, SendVerifyResponse)
 
 

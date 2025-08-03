@@ -65,11 +65,11 @@ def test_prepare_url_strips_trailing_slash(mocker: "MockerFixture", url: BooxUrl
 
 
 def test_post_calls_client_and_checks_status(mocker: "MockerFixture"):
-    mocked_response = mocker.Mock()
-    mocked_response.raise_for_status = mocker.Mock(return_value=mocked_response)
+    mock_response = mocker.Mock()
+    mock_response.raise_for_status = mocker.Mock(return_value=mock_response)
 
     mock_client = mocker.Mock()
-    mock_client.post = mocker.Mock(return_value=mocked_response)
+    mock_client.post = mocker.Mock(return_value=mock_response)
 
     mock_session = mocker.Mock()
     mock_session.client = mock_client
@@ -81,17 +81,17 @@ def test_post_calls_client_and_checks_status(mocker: "MockerFixture"):
 
     api._prepare_url.assert_called_once_with("/endpoint")
     mock_client.post.assert_called_once_with("https://foo.com/endpoint", json={"foo": "bar"})
-    mocked_response.raise_for_status.assert_called_once()
-    assert result == mocked_response
+    mock_response.raise_for_status.assert_called_once()
+    assert result == mock_response
 
 
 def test_post_raises_on_http_error(mocker: "MockerFixture"):
     url = "https://foo.com/endpoint"
-    mocked_response = mocker.Mock()
-    mocked_response.raise_for_status = mocker.Mock(side_effect=BaseHTTPError(url, HTTPStatus.BAD_REQUEST, {}, b''))
+    mock_response = mocker.Mock()
+    mock_response.raise_for_status = mocker.Mock(side_effect=BaseHTTPError(url, HTTPStatus.BAD_REQUEST, {}, b''))
 
     mock_client = mocker.Mock()
-    mock_client.post = mocker.Mock(return_value=mocked_response)
+    mock_client.post = mocker.Mock(return_value=mock_response)
 
     mock_session = mocker.Mock()
     mock_session.client = mock_client
@@ -122,11 +122,11 @@ def test_method_succeeds_with_token(faker: "Faker", mock_client: "Mock"):
 
 
 def test_get_calls_client_and_checks_status(mocker: "MockerFixture"):
-    mocked_response = mocker.Mock()
-    mocked_response.raise_for_status = mocker.Mock(return_value=mocked_response)
+    mock_response = mocker.Mock()
+    mock_response.raise_for_status = mocker.Mock(return_value=mock_response)
 
     mock_client = mocker.Mock()
-    mock_client.get = mocker.Mock(return_value=mocked_response)
+    mock_client.get = mocker.Mock(return_value=mock_response)
 
     mock_session = mocker.Mock()
     mock_session.client = mock_client
@@ -138,5 +138,5 @@ def test_get_calls_client_and_checks_status(mocker: "MockerFixture"):
 
     api._prepare_url.assert_called_once_with("/endpoint")
     mock_client.get.assert_called_once_with("https://foo.com/endpoint")
-    mocked_response.raise_for_status.assert_called_once()
-    assert result == mocked_response
+    mock_response.raise_for_status.assert_called_once()
+    assert result == mock_response

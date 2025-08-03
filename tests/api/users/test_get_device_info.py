@@ -49,17 +49,17 @@ def test_users_api_get_device_info_parses_response_correctly(
     mock_client: "Mock",
     url: BooxUrl,
 ):
-    mocked_response = mocker.Mock()
-    mocked_response.json.return_value = fake_device_info_response.build().model_dump()
-    mocked_response.raise_for_status.return_value = mocked_response
-    mock_client.get.return_value = mocked_response
+    mock_response = mocker.Mock()
+    mock_response.json.return_value = fake_device_info_response.build().model_dump()
+    mock_response.raise_for_status.return_value = mock_response
+    mock_client.get.return_value = mock_response
 
     with Boox(client=mock_client, base_url=url, token=faker.uuid4()) as boox:
         result = boox.users.get_device_info()
 
     mock_client.get.assert_called_once_with(url.value + "/api/1/users/getDevice")
-    mocked_response.json.assert_called_once()
-    mocked_response.raise_for_status.assert_called_once()
+    mock_response.json.assert_called_once()
+    mock_response.raise_for_status.assert_called_once()
     assert isinstance(result, DeviceInfoResponse)
     assert isinstance(result.data, tuple)
     assert all(isinstance(d, DataDevice) for d in result.data)

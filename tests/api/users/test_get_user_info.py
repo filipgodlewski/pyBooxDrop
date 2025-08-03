@@ -68,8 +68,8 @@ def test_get_user_info_e2e(config: "E2EConfig"):
         pytest.skip("Token was either not obtained or not set")
 
     with Boox(base_url=config.domain, token=config.token) as boox:
-        response = boox.users.get_user_info()
+        result = boox.users.get_user_info()
 
-    assert response.data.area_code
-    assert response.data.login_type == "email"
-    assert response.data.email == config.email_address
+    assert result.data.area_code
+    assert result.data.login_type == "email"
+    assert result.data.email == config.email_address

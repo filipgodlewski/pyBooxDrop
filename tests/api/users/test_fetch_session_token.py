@@ -67,7 +67,7 @@ def test_fetch_session_token_e2e(config: "E2EConfig"):
     payload = FetchTokenRequest.model_validate({"mobi": config.email_address, "code": config.verification_code})
 
     with Boox(base_url=config.domain) as boox:
-        response = boox.users.fetch_session_token(payload=payload)
+        result = boox.users.fetch_session_token(payload=payload)
 
-    assert response.data.token
-    config.token = response.data.token
+    assert result.data.token
+    config.token = result.data.token

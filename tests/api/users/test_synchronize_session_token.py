@@ -68,6 +68,6 @@ def test_synchronize_session_token_e2e(config: E2EConfig):
         pytest.skip("Token was either not obtained or not set")
 
     with Boox(base_url=config.domain, token=config.token) as boox:
-        response = boox.users.synchronize_session_token()
+        result = boox.users.synchronize_session_token()
 
-    assert response.data.expires
+    assert result.data.expires

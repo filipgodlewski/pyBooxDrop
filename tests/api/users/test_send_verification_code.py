@@ -66,9 +66,9 @@ def test_send_verification_code_e2e(config: "E2EConfig", email: "EmailProvider")
     payload = SendVerifyCodeRequest.model_validate({"mobi": config.email_address})
 
     with Boox(base_url=config.domain) as boox:
-        response = boox.users.send_verification_code(payload=payload)
+        result = boox.users.send_verification_code(payload=payload)
 
-    assert response.data == "ok"
+    assert result.data == "ok"
     message = email.get_newest_message()
     match = re.compile(r"^The code is (?P<code>\d{6}) for account verification from BOOX\.").match(message)
     assert match, "Did not match the received email"

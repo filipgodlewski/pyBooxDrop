@@ -41,20 +41,20 @@ def test_users_api_send_verification_code_parses_response_correctly(
     mocker: "MockerFixture",
     faker: "Faker",
     fake_send_verify_response: "FakeSendVerifyResponse",
-    mocked_client: "Mock",
+    mock_client: "Mock",
     url: BooxUrl,
 ):
     mocked_response = mocker.Mock()
     mocked_response.json.return_value = fake_send_verify_response.build().model_dump()
     mocked_response.raise_for_status.return_value = mocked_response
-    mocked_client.post.return_value = mocked_response
+    mock_client.post.return_value = mocked_response
 
-    with Boox(client=mocked_client, base_url=url) as boox:
+    with Boox(client=mock_client, base_url=url) as boox:
         send_data = {"mobi": faker.email()}
         payload = SendVerifyCodeRequest.model_validate(send_data)
         result = boox.users.send_verification_code(payload=payload)
 
-    mocked_client.post.assert_called_once_with(url.value + "/api/1/users/sendVerifyCode", json=send_data)
+    mock_client.post.assert_called_once_with(url.value + "/api/1/users/sendVerifyCode", json=send_data)
     mocked_response.json.assert_called_once()
     mocked_response.raise_for_status.assert_called_once()
     assert isinstance(result, SendVerifyResponse)

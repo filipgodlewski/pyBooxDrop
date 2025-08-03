@@ -28,7 +28,7 @@ def test_config_users_api_sync_token_integration(
     mocker: "MockerFixture",
     faker: "Faker",
     fake_sync_token_response: "FakeSyncTokenResponse",
-    mocked_client: "Mock",
+    mock_client: "Mock",
     url: BooxUrl,
 ):
     token = faker.uuid4()
@@ -36,13 +36,13 @@ def test_config_users_api_sync_token_integration(
     mocked_response = mocker.Mock()
     mocked_response.json = mocker.Mock(return_value=return_value.model_dump())
     mocked_response.raise_for_status.return_value = mocked_response
-    mocked_client.get.return_value = mocked_response
+    mock_client.get.return_value = mocked_response
 
-    with Boox(client=mocked_client, base_url=url, token=token) as boox:
+    with Boox(client=mock_client, base_url=url, token=token) as boox:
         result = boox.config_users.synchronize_token()
 
     expected_url = url.value + "/api/1/configUsers/one"
-    mocked_client.get.assert_called_once_with(expected_url)
+    mock_client.get.assert_called_once_with(expected_url)
     mocked_response.json.assert_called_once()
     assert isinstance(result, SyncTokenResponse)
     assert not result.data

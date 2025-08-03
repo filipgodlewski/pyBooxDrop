@@ -40,20 +40,20 @@ def test_users_api_fetch_session_token_integration(
     mocker: "MockerFixture",
     faker: "Faker",
     fake_fetch_token_response: "FakeFetchTokenResponse",
-    mocked_client: "Mock",
+    mock_client: "Mock",
     url: BooxUrl,
 ):
     mocked_response = mocker.Mock()
     mocked_response.json.return_value = fake_fetch_token_response.build().model_dump()
     mocked_response.raise_for_status.return_value = mocked_response
-    mocked_client.post.return_value = mocked_response
+    mock_client.post.return_value = mocked_response
 
-    with Boox(client=mocked_client, base_url=url) as boox:
+    with Boox(client=mock_client, base_url=url) as boox:
         send_data = {"mobi": faker.email(), "code": str(faker.random_number(digits=6))}
         payload = FetchTokenRequest.model_validate(send_data)
         result = boox.users.fetch_session_token(payload=payload)
 
-    mocked_client.post.assert_called_once_with(url.value + "/api/1/users/signupByPhoneOrEmail", json=send_data)
+    mock_client.post.assert_called_once_with(url.value + "/api/1/users/signupByPhoneOrEmail", json=send_data)
     mocked_response.json.assert_called_once()
     assert isinstance(result, FetchTokenResponse)
     assert isinstance(result.data, DataToken)

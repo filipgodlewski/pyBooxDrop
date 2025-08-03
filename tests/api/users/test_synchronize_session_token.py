@@ -45,18 +45,18 @@ def test_users_api_sync_session_token_integration(
     mocker: "MockerFixture",
     faker: "Faker",
     fake_sync_session_token_response: "FakeSyncSessionTokenResponse",
-    mocked_client: "Mock",
+    mock_client: "Mock",
     url: BooxUrl,
 ):
     mocked_response = mocker.Mock()
     mocked_response.json.return_value = fake_sync_session_token_response.build().model_dump()
     mocked_response.raise_for_status.return_value = mocked_response
-    mocked_client.get.return_value = mocked_response
+    mock_client.get.return_value = mocked_response
 
-    with Boox(client=mocked_client, base_url=url, token=faker.uuid4()) as boox:
+    with Boox(client=mock_client, base_url=url, token=faker.uuid4()) as boox:
         result = boox.users.synchronize_session_token()
 
-    mocked_client.get.assert_called_once_with(url.value + "/api/1/users/syncToken")
+    mock_client.get.assert_called_once_with(url.value + "/api/1/users/syncToken")
     mocked_response.json.assert_called_once()
     mocked_response.raise_for_status.assert_called_once()
     assert isinstance(result, SyncSessionTokenResponse)

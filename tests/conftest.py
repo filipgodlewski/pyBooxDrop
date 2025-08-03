@@ -33,7 +33,7 @@ def pytest_collection_modifyitems(config: "Config", items: list["Item"]) -> None
 
 
 @pytest.fixture
-def mocked_client(mocker: "MockerFixture") -> "Mock":
+def mock_client(mocker: "MockerFixture") -> "Mock":
     client = mocker.Mock()
     client.is_closed = False
     client.base_url = None

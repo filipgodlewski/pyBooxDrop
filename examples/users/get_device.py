@@ -16,7 +16,7 @@ with Boox(base_url=BooxUrl.PUSH, token=TOKEN) as boox:
     response: "DeviceInfoResponse" = boox.users.get_device_info()
 
 # For `data` field, this response returns an array of objects.
-# those objects are wrapped by `DataDevice` model
+# These objects are wrapped by `DataDevice` model
 _data: tuple["DataDevice", ...] = response.data
 
 for _item in _data:

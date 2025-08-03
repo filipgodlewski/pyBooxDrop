@@ -6,7 +6,13 @@ import pytest
 from polyfactory.factories.pydantic_factory import ModelFactory
 from polyfactory.pytest_plugin import register_fixture
 
-from boox.models.users import FetchTokenResponse, SendVerifyResponse, SyncSessionTokenResponse, UserInfoResponse
+from boox.models.users import (
+    DeviceInfoResponse,
+    FetchTokenResponse,
+    SendVerifyResponse,
+    SyncSessionTokenResponse,
+    UserInfoResponse,
+)
 from tests.api.utils import EmailProvider
 
 if TYPE_CHECKING:
@@ -46,4 +52,9 @@ class FakeSyncSessionTokenResponse(ModelFactory[SyncSessionTokenResponse]):
 
 @register_fixture
 class FakeUserInfoResponse(ModelFactory[UserInfoResponse]):
+    __check_model__ = True
+
+
+@register_fixture
+class FakeDeviceInfoResponse(ModelFactory[DeviceInfoResponse]):
     __check_model__ = True

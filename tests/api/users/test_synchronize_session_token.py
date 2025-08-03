@@ -22,19 +22,21 @@ if TYPE_CHECKING:
 
 
 def test_sync_session_token_calls_get_and_parses_response(
-    mocker: "MockerFixture",
-    fake_sync_session_token_response: "FakeSyncSessionTokenResponse",
+    mocker: "MockerFixture", fake_sync_session_token_response: "FakeSyncSessionTokenResponse"
 ):
-    mocked_response = mocker.Mock()
-    mocked_response.json.return_value = fake_sync_session_token_response.build().model_dump()
     api = UsersApi(session=mocker.Mock())
-    api._get = mocker.Mock(return_value=mocked_response)
+    api._get = mocker.Mock(return_value=mocker.Mock(json=fake_sync_session_token_response.build().model_dump))
 
     result = api.synchronize_session_token()
 
     api._get.assert_called_once_with(endpoint="/api/1/users/syncToken")
     assert isinstance(result, SyncSessionTokenResponse)
     assert isinstance(result.data, DataSession)
+
+
+def test_sync_session_token_raises_token_missing_error(mocked_boox: Boox):
+    with pytest.raises(TokenMissingError, match="Bearer token is required to call this method"):
+        mocked_boox.users.synchronize_session_token()
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
@@ -55,13 +57,9 @@ def test_users_api_sync_session_token_integration(
 
     mocked_client.get.assert_called_once_with(url.value + "/api/1/users/syncToken")
     mocked_response.json.assert_called_once()
+    mocked_response.raise_for_status.assert_called_once()
     assert isinstance(result, SyncSessionTokenResponse)
     assert isinstance(result.data, DataSession)
-
-
-def test_sync_session_token_raises_token_missing_error(mocked_boox: Boox):
-    with pytest.raises(TokenMissingError, match="Bearer token is required to call this method"):
-        mocked_boox.users.synchronize_session_token()
 
 
 @e2e

@@ -22,13 +22,10 @@ if TYPE_CHECKING:
 
 
 def test_get_user_info_calls_get_and_parses_response(
-    mocker: "MockerFixture",
-    fake_user_info_response: "FakeUserInfoResponse",
+    mocker: "MockerFixture", fake_user_info_response: "FakeUserInfoResponse"
 ):
-    mocked_response = mocker.Mock()
-    mocked_response.json.return_value = fake_user_info_response.build().model_dump()
     api = UsersApi(session=mocker.Mock())
-    api._get = mocker.Mock(return_value=mocked_response)
+    api._get = mocker.Mock(return_value=mocker.Mock(json=fake_user_info_response.build().model_dump))
 
     result = api.get_user_info()
 
@@ -38,7 +35,7 @@ def test_get_user_info_calls_get_and_parses_response(
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_users_api_get_user_info_integration(
+def test_users_api_get_user_info_parses_response_correctly(
     mocker: "MockerFixture",
     faker: "Faker",
     fake_user_info_response: "FakeUserInfoResponse",
@@ -55,6 +52,7 @@ def test_users_api_get_user_info_integration(
 
     mocked_client.get.assert_called_once_with(url.value + "/api/1/users/me")
     mocked_response.json.assert_called_once()
+    mocked_response.raise_for_status.assert_called_once()
     assert isinstance(result, UserInfoResponse)
     assert isinstance(result.data, DataUser)
 

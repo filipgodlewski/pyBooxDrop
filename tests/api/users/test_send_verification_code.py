@@ -26,10 +26,8 @@ def test_send_verification_code_calls_post_and_parses_response(
     faker: "Faker",
     fake_send_verify_response: "FakeSendVerifyResponse",
 ):
-    mocked_response = mocker.Mock()
-    mocked_response.json.return_value = fake_send_verify_response.build().model_dump()
     api = UsersApi(session=mocker.Mock())
-    api._post = mocker.Mock(return_value=mocked_response)
+    api._post = mocker.Mock(return_value=mocker.Mock(json=fake_send_verify_response.build().model_dump))
 
     send_data = {"mobi": faker.email()}
     result = api.send_verification_code(payload=SendVerifyCodeRequest.model_validate(send_data))
@@ -39,7 +37,7 @@ def test_send_verification_code_calls_post_and_parses_response(
 
 
 @pytest.mark.parametrize("url", list(BooxUrl))
-def test_users_api_send_verification_code_integration(
+def test_users_api_send_verification_code_parses_response_correctly(
     mocker: "MockerFixture",
     faker: "Faker",
     fake_send_verify_response: "FakeSendVerifyResponse",
@@ -58,6 +56,7 @@ def test_users_api_send_verification_code_integration(
 
     mocked_client.post.assert_called_once_with(url.value + "/api/1/users/sendVerifyCode", json=send_data)
     mocked_response.json.assert_called_once()
+    mocked_response.raise_for_status.assert_called_once()
     assert isinstance(result, SendVerifyResponse)
 
 

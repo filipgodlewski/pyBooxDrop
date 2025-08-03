@@ -25,10 +25,8 @@ def test_fetch_session_token_calls_post_and_parses_response(
     faker: "Faker",
     fake_fetch_token_response: "FakeFetchTokenResponse",
 ):
-    mocked_response = mocker.Mock()
-    mocked_response.json.return_value = fake_fetch_token_response.build().model_dump()
     api = UsersApi(session=mocker.Mock())
-    api._post = mocker.Mock(return_value=mocked_response)
+    api._post = mocker.Mock(return_value=mocker.Mock(json=fake_fetch_token_response.build().model_dump))
 
     send_data = {"mobi": faker.email(), "code": str(faker.random_number(digits=6))}
     result = api.fetch_session_token(payload=FetchTokenRequest.model_validate(send_data))

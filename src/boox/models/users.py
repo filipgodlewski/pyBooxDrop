@@ -18,6 +18,9 @@ from pydantic_core import PydanticCustomError
 
 from boox.models.base import BaseResponse, BaseSyncResponse
 
+# NOTE: If having `Any`, it means that it lacks information on type based on my internal testing.
+# If you have some additional data, please contribute.
+
 
 def soft_validate_email(value: str) -> bool:
     with suppress(PydanticCustomError):
@@ -114,8 +117,6 @@ class SyncSessionTokenResponse(BaseSyncResponse[DataSession]):
 
 
 class DataUser(BaseModel):
-    # NOTE: If having `Any`, it means that it lacks information on type based on my internal testing.
-    # If you have some additional data, please contribute.
     model_config: ClassVar[ConfigDict] = ConfigDict(serialize_by_alias=True)
 
     access_token: Any | None = Field(alias="accessToken")
@@ -162,7 +163,7 @@ class DataDevice(BaseModel):
     id: int
     model: str
     device_unique_id: str = Field(alias="deviceUniqueId")
-    mac_address: str = Field(alias="macAddress")  # TODO: consider pydantic_extra_types.mac_address
+    mac_address: str = Field(alias="macAddress")
     number: Any | None
     version_int: int = Field(alias="versionInt")
     version_release: str = Field(alias="versionRelease")
